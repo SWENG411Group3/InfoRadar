@@ -13,5 +13,10 @@ namespace InformationRadarCore.Data
         {
 
         }
+
+        public DbSet<Lighthouse> Lighthouses { get; set; }
+        public DbSet<Site> Sites { get; set; }
+        public DbSet<GoogleQuery> GoogleQueries { get; set; }
+
     }
 }
