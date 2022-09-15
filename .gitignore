@@ -1,1 +1,3 @@
 InformationRadarCore/.vs
+.env
+__pycache__
