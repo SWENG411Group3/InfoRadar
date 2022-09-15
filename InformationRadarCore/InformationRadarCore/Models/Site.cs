@@ -16,6 +16,9 @@ namespace InformationRadarCore.Models
         [Required]
         public string Url { get; set; }
 
+        /// <summary>
+        /// The content type that should be expected from the URL
+        /// </summary>
         [Required]
         public SiteContentType Content { get; set; }
     }
