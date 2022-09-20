@@ -4,6 +4,13 @@ using System.ComponentModel.DataAnnotations;
 namespace InformationRadarCore.Models
 {
 
+    public enum LighthouseSize { 
+        Small,
+        Medium,
+        Large,
+        ExtraLarge,
+    }
+
     [Index(nameof(InternalName), IsUnique = true)]
     public class Lighthouse
     {
@@ -27,10 +34,18 @@ namespace InformationRadarCore.Models
         public DateTime? LastVisitorRun { get; set; }
 
         /// <summary>
-        /// How often the lighthouse gathers data (measured in seconds)
+        /// The estimated size of the lighthouse
         /// </summary>
         [Required]
-        public ulong Frequency { get; set; }
+        public LighthouseSize BaseSize { get; set; }
+
+        /// <summary>
+        /// How often the lighthouse gathers data (measured in seconds)
+        /// If this is left unspecified, the frequency will be automatically determined 
+        /// based on the lighthouse's base size
+        /// </summary>
+        [Required]
+        public ulong? Frequency { get; set; }
 
         /// <summary>
         /// How often the lighthouse checks if a message should be sent to recipients
@@ -46,6 +61,12 @@ namespace InformationRadarCore.Models
         /// Last time lighthouse sent a message out
         /// </summary>
         public DateTime? LastSentMessage { get; set; }
+
+        /// <summary>
+        /// Whether or not the lighthouse should run
+        /// </summary>
+        [Required]
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// App users who will recieve a message

@@ -7,6 +7,7 @@ namespace InformationRadarCore.Models
         Html,
         Json,
         Rss,
+        Raw,
     }
 
     public class Site
@@ -21,5 +22,11 @@ namespace InformationRadarCore.Models
         /// </summary>
         [Required]
         public SiteContentType Content { get; set; }
+
+        /// <summary>
+        /// The date this site was added
+        /// </summary>
+        [Required]
+        public DateTime Created { get; set; }
     }
 }
