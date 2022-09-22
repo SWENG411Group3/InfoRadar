@@ -14,6 +14,8 @@ namespace InformationRadarCore.Models
     {
         public int Id { get; set; }
 
+        public ICollection<Lighthouse> Lighthouses { get; set; }
+
         [Required]
         public string Url { get; set; }
 

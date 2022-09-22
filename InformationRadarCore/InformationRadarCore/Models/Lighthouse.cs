@@ -58,6 +58,11 @@ namespace InformationRadarCore.Models
         public DateTime Created { get; set; }
 
         /// <summary>
+        /// Last time lighthouse settings were changed
+        /// </summary>
+        public DateTime? LastUpdated { get; set; }
+
+        /// <summary>
         /// Last time lighthouse sent a message out
         /// </summary>
         public DateTime? LastSentMessage { get; set; }
@@ -71,10 +76,10 @@ namespace InformationRadarCore.Models
         /// <summary>
         /// App users who will recieve a message
         /// </summary>
-        public List<ApplicationUser> Recipients { get; set; }
+        public ICollection<ApplicationUser> Recipients { get; set; }
 
-        public List<GoogleQuery> GoogleQueries { get; set; }
+        public ICollection<GoogleQuery> GoogleQueries { get; set; }
 
-        public List<Site> Sites { get; set; }
+        public ICollection<Site> Sites { get; set; }
     }
 }

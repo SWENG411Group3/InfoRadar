@@ -6,8 +6,7 @@ namespace InformationRadarCore.Models
     {
         public int Id { get; set; }
 
-        [MaxLength(100)]
-        public string EngineId { get; set; }
+        public ICollection<Lighthouse> Lighthouses { get; set; }
 
         [Required]
         public string Query { get; set; }
