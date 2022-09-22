@@ -1,3 +1,4 @@
+using IdentityModel;
 using InformationRadarCore.Data;
 using InformationRadarCore.Models;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace InformationRadarCore
 {
@@ -34,28 +37,28 @@ namespace InformationRadarCore
                 .AddIdentityServerJwt();
 
             var validIssuer = settings.GetValue<string>("ReactValidIssuer");  
-            if (!string.IsNullOrEmpty(validIssuer))
-            {
-                builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+            builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
                 options =>
                 {
-                    var config = new[] { validIssuer };
-                    var validIssuers = options.TokenValidationParameters.ValidIssuers;
-
-                    if (validIssuers == null)
+                    if (!string.IsNullOrEmpty(validIssuer))
                     {
-                        validIssuers = config;
-                    }
-                    else
-                    {
-                        validIssuers = validIssuers.Concat(config);
-                    }
+                        var config = new[] { validIssuer };
+                        var validIssuers = options.TokenValidationParameters.ValidIssuers;
 
-                    options.TokenValidationParameters.ValidIssuers = validIssuers;
+                        if (validIssuers == null)
+                        {
+                            validIssuers = config;
+                        }
+                        else
+                        {
+                            validIssuers = validIssuers.Concat(config);
+                        }
+
+                        options.TokenValidationParameters.ValidIssuers = validIssuers;
+                    }
+                    options.TokenValidationParameters.AuthenticationType = "ApplicationCookie";
+                    options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
                 });
-
-            }
-            
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
