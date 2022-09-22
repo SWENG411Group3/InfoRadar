@@ -9,57 +9,11 @@ using Microsoft.AspNetCore.Authorization;
 using Duende.IdentityServer.Extensions;
 using IdentityModel;
 using System.Security.Claims;
-
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 // @TODO implement user permission levels
 namespace InformationRadarCore.Controllers
 {
-    public class LighthouseResponse
-    {
-        public string Title { get; set; }
-        public bool Active { get; set; }
-        public bool Subscribed { get; set; }
-        public bool Enabled { get; set; }
-    }
-
-    public class LighthousePageQuery
-    {
-        public int? PageSize { get; set; }
-        public int? Cursor { get; set; }
-    }
-
-    public class CreateLighthousePayload
-    {
-        [Required, MinLength(1), MaxLength(100)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z]*$")]
-        public string InternalName { get; set; }
-
-        [Required, MaxLength(100)]
-        public string Title { get; set; }
-
-        public bool? Enabled { get; set; }
-
-        public ulong? Frequency { get; set; }
-
-        public ulong? MessengerFrequency { get; set; }
-
-        [Required]
-        public LighthouseSize BaseSize { get; set; }
-
-
-    }
-
-    public class PatchLighthousePayload
-    {
-        public bool? Enabled { get; set; }
-        public ulong? Frequency { get; set; }
-        public ulong? MessengerFrequency { get; set; }
-        public string Title { get; set; }
-        public LighthouseSize? BaseSize { get; set; }
-    }
-
-
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
@@ -77,37 +31,31 @@ namespace InformationRadarCore.Controllers
         {
             var size = query.PageSize ?? 10;
             
-            
             return await db.Lighthouses.OrderBy(e => e.Id)
                 .Where(e => !query.Cursor.HasValue || e.Id < query.Cursor.Value)
                 .Select(e => new
                 {
+                    Id = e.Id,
+                    Title = e.Title,
+                    Enabled = e.Enabled,
+                    BaseSize = e.BaseSize,
                     Subscribed = e.Recipients.Any(user => user.Id == User.GetDisplayName()),
-                    Recipients = e.Recipients.Count(),
-                    Sites = e.Sites.Count(),
-                    
                 })
                 .Take(size).ToListAsync();
         }
 
         // GET api/<LighthouseController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Task<Lighthouse?> Get(int id)
         {
-            return "value";
+            return db.Lighthouses.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPatch("{id}")]
         async public Task<IActionResult> Patch(int id, [FromBody] PatchLighthousePayload body)
         {
-            if (User.Identity == null)
-            {
-                return Unauthorized();
-            }
-
             var lighthouse = await db.Lighthouses.FirstOrDefaultAsync(e => e.Id == id);
             if (lighthouse == null)
             {
@@ -143,24 +91,43 @@ namespace InformationRadarCore.Controllers
 
             return Ok();
         }
+    }
 
-        // POST api/<LighthouseController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
+    public class LighthousePageQuery
+    {
+        public int? PageSize { get; set; }
+        public int? Cursor { get; set; }
+    }
 
-        }
+    public enum LighthouseRecordType {
+        Int,
+        Long,
+        Double,
+        String,
+    }
 
-        // PUT api/<LighthouseController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+    public class CreateLighthousePayload
+    {
+        [Required, MinLength(1), MaxLength(100)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z]*$")]
+        public string InternalName { get; set; }
+        [Required, MaxLength(100)]
+        public string Title { get; set; }
+        public bool? Enabled { get; set; }
+        public ulong? Frequency { get; set; }
+        public ulong? MessengerFrequency { get; set; }
+        [Required]
+        public LighthouseSize BaseSize { get; set; }
+        [Required]
+        public Dictionary<string, LighthouseRecordType> Types { get; set; }
+    }
 
-        // DELETE api/<LighthouseController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+    public class PatchLighthousePayload
+    {
+        public bool? Enabled { get; set; }
+        public ulong? Frequency { get; set; }
+        public ulong? MessengerFrequency { get; set; }
+        public string Title { get; set; }
+        public LighthouseSize? BaseSize { get; set; }
     }
 }
