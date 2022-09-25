@@ -4,6 +4,7 @@ using InformationRadarCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,31 +12,17 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InformationRadarCore.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220918015649_LighthouseSize")]
+    partial class LighthouseSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("ProductVersion", "6.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("ApplicationUserLighthouse", b =>
-                {
-                    b.Property<int>("LighthousesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RecipientsId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("LighthousesId", "RecipientsId");
-
-                    b.HasIndex("RecipientsId");
-
-                    b.ToTable("ApplicationUserLighthouse", (string)null);
-                });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.DeviceFlowCodes", b =>
                 {
@@ -120,7 +107,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("Use");
 
-                    b.ToTable("Keys", (string)null);
+                    b.ToTable("Keys");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.PersistedGrant", b =>
@@ -178,21 +165,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.ToTable("PersistedGrants", (string)null);
                 });
 
-            modelBuilder.Entity("GoogleQueryLighthouse", b =>
-                {
-                    b.Property<int>("GoogleQueriesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LighthousesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GoogleQueriesId", "LighthousesId");
-
-                    b.HasIndex("LighthousesId");
-
-                    b.ToTable("GoogleQueryLighthouse", (string)null);
-                });
-
             modelBuilder.Entity("InformationRadarCore.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -211,6 +183,9 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("LighthouseId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -247,6 +222,8 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LighthouseId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -266,13 +243,23 @@ namespace InformationRadarCore.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("EngineId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("LighthouseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Query")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("GoogleQueries", (string)null);
+                    b.HasIndex("LighthouseId");
+
+                    b.ToTable("GoogleQueries");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Lighthouse", b =>
@@ -303,9 +290,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.Property<DateTime?>("LastSentMessage")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("LastVisitorRun")
                         .HasColumnType("datetime2");
 
@@ -322,7 +306,7 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("InternalName")
                         .IsUnique();
 
-                    b.ToTable("Lighthouses", (string)null);
+                    b.ToTable("Lighthouses");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
@@ -339,28 +323,18 @@ namespace InformationRadarCore.Data.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("LighthouseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sites", (string)null);
-                });
+                    b.HasIndex("LighthouseId");
 
-            modelBuilder.Entity("LighthouseSite", b =>
-                {
-                    b.Property<int>("LighthousesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SitesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("LighthousesId", "SitesId");
-
-                    b.HasIndex("SitesId");
-
-                    b.ToTable("LighthouseSite", (string)null);
+                    b.ToTable("Sites");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -500,49 +474,25 @@ namespace InformationRadarCore.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ApplicationUserLighthouse", b =>
+            modelBuilder.Entity("InformationRadarCore.Models.ApplicationUser", b =>
                 {
                     b.HasOne("InformationRadarCore.Models.Lighthouse", null)
-                        .WithMany()
-                        .HasForeignKey("LighthousesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("InformationRadarCore.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("RecipientsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Recipients")
+                        .HasForeignKey("LighthouseId");
                 });
 
-            modelBuilder.Entity("GoogleQueryLighthouse", b =>
+            modelBuilder.Entity("InformationRadarCore.Models.GoogleQuery", b =>
                 {
-                    b.HasOne("InformationRadarCore.Models.GoogleQuery", null)
-                        .WithMany()
-                        .HasForeignKey("GoogleQueriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("InformationRadarCore.Models.Lighthouse", null)
-                        .WithMany()
-                        .HasForeignKey("LighthousesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("GoogleQueries")
+                        .HasForeignKey("LighthouseId");
                 });
 
-            modelBuilder.Entity("LighthouseSite", b =>
+            modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
                 {
                     b.HasOne("InformationRadarCore.Models.Lighthouse", null)
-                        .WithMany()
-                        .HasForeignKey("LighthousesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("InformationRadarCore.Models.Site", null)
-                        .WithMany()
-                        .HasForeignKey("SitesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Sites")
+                        .HasForeignKey("LighthouseId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -594,6 +544,15 @@ namespace InformationRadarCore.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("InformationRadarCore.Models.Lighthouse", b =>
+                {
+                    b.Navigation("GoogleQueries");
+
+                    b.Navigation("Recipients");
+
+                    b.Navigation("Sites");
                 });
 #pragma warning restore 612, 618
         }
