@@ -38,7 +38,6 @@ namespace InformationRadarCore.Controllers
                     Id = e.Id,
                     Title = e.Title,
                     Enabled = e.Enabled,
-                    BaseSize = e.BaseSize,
                     Subscribed = e.Recipients.Any(user => user.Id == User.GetDisplayName()),
                 })
                 .Take(size).ToListAsync();
@@ -82,11 +81,6 @@ namespace InformationRadarCore.Controllers
                 lighthouse.MessengerFrequency = body.MessengerFrequency.Value;
             }
 
-            if (body.BaseSize.HasValue)
-            {
-                lighthouse.BaseSize = body.BaseSize.Value;
-            }
-
             await db.SaveChangesAsync();
 
             return Ok();
@@ -117,8 +111,6 @@ namespace InformationRadarCore.Controllers
         public ulong? Frequency { get; set; }
         public ulong? MessengerFrequency { get; set; }
         [Required]
-        public LighthouseSize BaseSize { get; set; }
-        [Required]
         public Dictionary<string, LighthouseRecordType> Types { get; set; }
     }
 
@@ -128,6 +120,5 @@ namespace InformationRadarCore.Controllers
         public ulong? Frequency { get; set; }
         public ulong? MessengerFrequency { get; set; }
         public string Title { get; set; }
-        public LighthouseSize? BaseSize { get; set; }
     }
 }

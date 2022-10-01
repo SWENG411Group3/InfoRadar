@@ -4,13 +4,6 @@ using System.ComponentModel.DataAnnotations;
 namespace InformationRadarCore.Models
 {
 
-    public enum LighthouseSize { 
-        Small,
-        Medium,
-        Large,
-        ExtraLarge,
-    }
-
     [Index(nameof(InternalName), IsUnique = true)]
     public class Lighthouse
     {
@@ -22,7 +15,7 @@ namespace InformationRadarCore.Models
         /// The associated python script will be named [INTERNAL NAME]_lighthouse.py
         /// </summary>
         [Required, MinLength(1), MaxLength(100)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z]*$")]
+        [RegularExpression(@"^[a-zA-Z]\w*$")]
         public string InternalName { get; set; }
 
         /// <summary>
@@ -34,18 +27,12 @@ namespace InformationRadarCore.Models
         public DateTime? LastVisitorRun { get; set; }
 
         /// <summary>
-        /// The estimated size of the lighthouse
-        /// </summary>
-        [Required]
-        public LighthouseSize BaseSize { get; set; }
-
-        /// <summary>
         /// How often the lighthouse gathers data (measured in seconds)
         /// If this is left unspecified, the frequency will be automatically determined 
         /// based on the lighthouse's base size
         /// </summary>
         [Required]
-        public ulong? Frequency { get; set; }
+        public ulong Frequency { get; set; }
 
         /// <summary>
         /// How often the lighthouse checks if a message should be sent to recipients
@@ -81,5 +68,7 @@ namespace InformationRadarCore.Models
         public ICollection<GoogleQuery> GoogleQueries { get; set; }
 
         public ICollection<Site> Sites { get; set; }
+
+        public TemplateConfiguration TemplateConfig { get; set; }
     }
 }
