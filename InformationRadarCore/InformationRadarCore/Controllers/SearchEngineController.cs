@@ -1,4 +1,5 @@
-﻿namespace InformationRadarCore.Controllers
+﻿using InformationRadarCore.Models
+namespace InformationRadarCore.Controllers
 
 public class SearchEngineController
 {
