@@ -133,7 +133,7 @@ namespace InformationRadarCore.Models
         /// <summary>
         /// Sets the writeError attribute and writes it to the error log file
         /// </summary>
-        public void WriteError
+        public WriteError
         {
             set 
             {
@@ -148,7 +148,7 @@ namespace InformationRadarCore.Models
         private async Task WriteErrorOut()
         {
             //Open Error log and write file here
-            using StreamWriter file = new( DateTime, this.errorFile, append: true);
+            using StreamWriter file = new( DateTime + "\t" + this.errorFile, append: true);
             await file.WriteLineAsync ( this.writeError );
             if (file.Dispose)
             {
