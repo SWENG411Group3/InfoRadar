@@ -4,6 +4,7 @@ using InformationRadarCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InformationRadarCore.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220922073953_Fix2MRelationships")]
+    partial class Fix2MRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("RecipientsId");
 
-                    b.ToTable("ApplicationUserLighthouse", (string)null);
+                    b.ToTable("ApplicationUserLighthouse");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.DeviceFlowCodes", b =>
@@ -120,7 +122,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("Use");
 
-                    b.ToTable("Keys", (string)null);
+                    b.ToTable("Keys");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.PersistedGrant", b =>
@@ -190,7 +192,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("LighthousesId");
 
-                    b.ToTable("GoogleQueryLighthouse", (string)null);
+                    b.ToTable("GoogleQueryLighthouse");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.ApplicationUser", b =>
@@ -272,7 +274,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GoogleQueries", (string)null);
+                    b.ToTable("GoogleQueries");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Lighthouse", b =>
@@ -322,7 +324,7 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("InternalName")
                         .IsUnique();
 
-                    b.ToTable("Lighthouses", (string)null);
+                    b.ToTable("Lighthouses");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
@@ -345,7 +347,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sites", (string)null);
+                    b.ToTable("Sites");
                 });
 
             modelBuilder.Entity("LighthouseSite", b =>
@@ -360,7 +362,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("SitesId");
 
-                    b.ToTable("LighthouseSite", (string)null);
+                    b.ToTable("LighthouseSite");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
