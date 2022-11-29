@@ -17,7 +17,8 @@ namespace InformationRadarCore.Models
         [Required]
         public string DataType { get; set; }
 
-        public int TemplateId { get; set; }
+        [Required]
         public Template Template { get; set; }
+        public int TemplateId { get; set; }
     }
 }

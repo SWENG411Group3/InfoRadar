@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InformationRadarCore.Models
 {
-
     [Index(nameof(InternalName), IsUnique = true)]
     public class Lighthouse
     {
@@ -21,9 +21,17 @@ namespace InformationRadarCore.Models
         /// <summary>
         /// The human-readable title of the lighthouse
         /// </summary>
-        [Required, MaxLength(100)]
+        [Required, MaxLength(300)]
         public string Title { get; set; }
 
+        /// <summary>
+        /// Lighthouse description
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Last time the scraper ran
+        /// </summary>
         public DateTime? LastVisitorRun { get; set; }
 
         /// <summary>
@@ -55,10 +63,30 @@ namespace InformationRadarCore.Models
         public DateTime? LastSentMessage { get; set; }
 
         /// <summary>
+        /// Index of the latest log file
+        /// </summary>
+        public int LatestLog { get; set; } = 0;
+
+        /// <summary>
         /// Whether or not the lighthouse should run
         /// </summary>
         [Required]
         public bool Enabled { get; set; }
+
+        /// <summary>
+        /// Bool set if an irrecoverable error has been thrown on lighthouse
+        /// </summary>
+        [Required]
+        public bool HasError { get; set; } = false;
+
+        [MaxLength(16)]
+        public string? Thumbnail { get; set; }
+
+        [Required]
+        public bool Running { get; set; } = false;
+
+        [Required]
+        public bool SearchRunning { get; set; } = false;
 
         /// <summary>
         /// App users who will recieve a message
@@ -68,7 +96,8 @@ namespace InformationRadarCore.Models
         public ICollection<GoogleQuery> GoogleQueries { get; set; }
 
         public ICollection<Site> Sites { get; set; }
+        public ICollection<Tag> Tags { get; set; } 
 
-        public TemplateConfiguration TemplateConfig { get; set; }
+        public TemplateConfiguration? TemplateConfig { get; set; }
     }
 }

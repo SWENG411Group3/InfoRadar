@@ -9,8 +9,14 @@ namespace InformationRadarCore.Models
     {
         public int Id { get; set; }
 
+        [Required, MaxLength(300)]
+        public string Title { get; set; }
+
+        [MaxLength(700)]
+        public string Description { get; set; }
+
         [Required, MinLength(1), MaxLength(100)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z]*$")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Template name can only contain letters")]
         public string InternalName { get; set; }
 
         public ICollection<TemplateField> TemplateFields { get; set; }
