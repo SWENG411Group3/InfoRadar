@@ -24,7 +24,7 @@ namespace InformationRadarCore
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString), ServiceLifetime.Transient);
+                options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
@@ -36,12 +36,11 @@ namespace InformationRadarCore
 
             builder.Services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-            builder.Services.AddTransient<UserManager<ApplicationUser>>();
-
-            builder.Services.AddAuthentication("Bearer")
+            builder.Services.AddAuthentication()
                 .AddIdentityServerJwt();
 
-            builder.Services.AddLocalApiAuthentication();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IDynDb, DynDb>();
 
             var configService = new ConfigService();
             settings.Bind(configService);
@@ -92,8 +91,9 @@ namespace InformationRadarCore
             app.UseStaticFiles();
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseIdentityServer();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
@@ -103,20 +103,9 @@ namespace InformationRadarCore
 
             app.MapFallbackToFile("index.html");
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                roleSetup(roleManager);
-
-                if (app.Environment.IsDevelopment() && !string.IsNullOrEmpty(configService.SeedAdmin))
-                {
-                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                    var admin = userManager.FindByEmailAsync(configService.SeedAdmin).Result;
-                    userManager.AddToRoleAsync(admin, "Admin").Wait();
-                }
-                
-
-            }
+            Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Old", "Scripts"));
+            Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Scraper", "scripts", "templates"));
+            Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "Images"));
 
             app.Run();
         }

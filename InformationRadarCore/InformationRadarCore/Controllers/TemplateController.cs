@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 
 namespace InformationRadarCore.Controllers
 {
-
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
@@ -17,26 +16,40 @@ namespace InformationRadarCore.Controllers
     {
         private readonly ApplicationDbContext db;
         private readonly ConfigService config;
+        private readonly IAuthService auth;
 
-        public TemplateController(ApplicationDbContext db, ConfigService configuration)
+        public TemplateController(ApplicationDbContext db, ConfigService configuration, IAuthService auth)
         {
             this.db = db;
             config = configuration;
+            this.auth = auth;
         }
 
         [HttpGet]
-        public async Task<CursorResponse<Template>> Index([FromQuery] PaginatorQuery query)
+        public async Task<object> Index([FromQuery] PaginatorQuery<int?> query)
         {
             var entries = await db.Templates
                 .OrderByDescending(e => e.Id)
                 .Where(e => !query.Cursor.HasValue || e.Id < query.Cursor.Value)
-                .Include(t => t.LighthouseColumns)
                 .Include(t => t.TemplateFields)
+                .Select(template => new
+                { 
+                    template.Id,
+                    template.InternalName,
+                    template.Title,
+                    template.Description,
+                    Fields = template.TemplateFields.Select(t => new
+                    { 
+                        t.Name,
+                        t.Description,
+                        DataType = t.DataType.ToString(),
+                    }).ToList(),
+                })
                 .Take(query.PageSize)
                 .ToListAsync();
 
             int? cursor = entries.LastOrDefault()?.Id;
-            return new CursorResponse<Template>()
+            return new 
             {
                 Entries = entries,
                 Cursor = cursor,
@@ -45,18 +58,39 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpGet("{id}")]
-        public Task<Template?> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            return db.Templates
+            return Ok(await db.Templates
                 .Include(t => t.LighthouseColumns)
                 .Include(t => t.TemplateFields)
-                .FirstOrDefaultAsync(template => template.Id == id);
+                .Select(template => new 
+                {
+                    template.Id,
+                    template.InternalName,
+                    template.Title,
+                    template.Description,
+                    Fields = template.TemplateFields.Select(t => new
+                    {
+                        Name = t.Name,
+                        Description = t.Description,
+                        DataType = t.DataType.ToString(),
+                    }).ToList(),
+                    Columns = template.LighthouseColumns.Count(),
+                })
+                .FirstOrDefaultAsync(template => template.Id == id));
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] TemplatePayload body)
         {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
             if (await db.Templates.AnyAsync(t => t.InternalName == body.InternalName))
             {
                 return BadRequest(new
@@ -72,19 +106,25 @@ namespace InformationRadarCore.Controllers
             }
             catch (LighthouseColumnException e)
             {
-                return BadRequest(new
-                {
-                    Message = e.Message,
-                });
+                return BadRequest(new { e.Message });
             }
 
-            foreach (var col in body.Fields.Keys)
+            foreach (var (col, ty) in body.Fields)
             {
                 if (!Regex.IsMatch(col, @"^[a-zA-Z]\w{0,99}$"))
                 {
                     return BadRequest(new
                     {
                         Message = $"Invalid template field \"{col}\".  Must be 100 chars or less and abide by Python identifier naming rules",
+                    });
+                }
+
+                TemplateFieldType t;
+                if (!Enum.TryParse(ty.Type, out t))
+                {
+                    return BadRequest(new
+                    {
+                        Message = $"Invalid template field type \"{ty.Type}\"",
                     });
                 }
             }
@@ -114,7 +154,7 @@ namespace InformationRadarCore.Controllers
                 await db.TemplateFields.AddAsync(new TemplateField()
                 {
                     Name = key,
-                    DataType = data.Type,
+                    DataType = Enum.Parse<TemplateFieldType>(data.Type),
                     Description = data.Description,
                     Template = tmp.Entity,
                 });
@@ -130,9 +170,16 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
             var template = await db.Templates.SingleOrDefaultAsync(t => t.Id == id);
             if (template == null)
             {

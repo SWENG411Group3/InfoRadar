@@ -7,7 +7,7 @@ namespace InformationRadarCore.Models.Web
         // Parses type from platform agnostic type string
         public static ILighthouseColumnType Parse(string s)
         {
-            var match = Regex.Match(@"^(?<typename>[a-zA-Z]+)(?:\((?<length>[1-9]\d{0,3})\))?$", s);
+            var match = Regex.Match(s, @"^(?<typename>[a-zA-Z]+)(?:\((?<length>[1-9]\d{0,3})\))?$");
 
             if (match == null || !match.Success)
             {
@@ -103,7 +103,7 @@ namespace InformationRadarCore.Models.Web
         public LighthouseUnsizedRecordFieldType Type { get; set; }
 
         public string Seralize() {
-            var name = Enum.GetName<LighthouseUnsizedRecordFieldType>(Type);
+            var name = Enum.GetName(Type);
             if (string.IsNullOrEmpty(name)) {
                 throw new Exception("Null or out of range unsized type");
             }
@@ -146,7 +146,7 @@ namespace InformationRadarCore.Models.Web
 
         public string Seralize()
         {
-            var name = Enum.GetName<LighthouseSizedRecordFieldType>(Type);
+            var name = Enum.GetName(Type);
             if (string.IsNullOrEmpty(name))
             {
                 throw new Exception("Null or out of range sized type");

@@ -16,13 +16,16 @@ namespace InformationRadarCore.Controllers
     public class SearchEngineController : Controller
     {
         private readonly ApplicationDbContext db;
-        public SearchEngineController(ApplicationDbContext db)
+        private readonly IAuthService auth;
+
+        public SearchEngineController(ApplicationDbContext db, IAuthService auth)
         {
             this.db = db;
+            this.auth = auth;
         }
 
         [HttpGet("Sites")]
-        public async Task<CursorResponse<Site>> GetSites([FromQuery] SearchQueryPaginatorQuery query)
+        public async Task<CursorResponse<Site, int?>> GetSites([FromQuery] SearchQueryPaginatorQuery query)
         {
             int? lh = query.Lighthouse;
             var entries = await db.Sites
@@ -33,7 +36,7 @@ namespace InformationRadarCore.Controllers
                 .ToListAsync();
 
             int? cursor = entries.LastOrDefault()?.Id;
-            return new CursorResponse<Site>()
+            return new CursorResponse<Site, int?>()
             {
                 Entries = entries,
                 Cursor = cursor,
@@ -43,15 +46,30 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpPost("Sites")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddSite([FromBody] SitePayload body)
         {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
             var lighthouse = await db.Lighthouses.SingleOrDefaultAsync(l => l.Id == body.Lighthouse);
             if (lighthouse == null)
             {
                 return NotFound(new
                 {
                     Message = $"No lighthouse with id \"{body.Lighthouse}\""
+                });
+            }
+
+            if (body.Site == null)
+            {
+                return BadRequest(new
+                { 
+                    Message = "Could not parse site parameter in request body"
                 });
             }
 
@@ -76,9 +94,16 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpDelete("Sites/{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveSite(int id)
         {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
             var site = await db.Sites.SingleOrDefaultAsync(q => q.Id == id);
             if (site == null)
             {
@@ -95,7 +120,7 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpGet("Queries")]
-        public async Task<CursorResponse<GoogleQuery>> GetQueries([FromQuery] SearchQueryPaginatorQuery query)
+        public async Task<CursorResponse<GoogleQuery, int?>> GetQueries([FromQuery] SearchQueryPaginatorQuery query)
         {
             int? lh = query.Lighthouse;
             var entries = await db.GoogleQueries
@@ -106,7 +131,7 @@ namespace InformationRadarCore.Controllers
                 .ToListAsync();
 
             int? cursor = entries.LastOrDefault()?.Id;
-            return new CursorResponse<GoogleQuery>()
+            return new CursorResponse<GoogleQuery, int?>()
             { 
                 Entries = entries,
                 Cursor = cursor,
@@ -116,9 +141,16 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpPost("Queries")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddQuery([FromBody] SearchQueryPayload body)
         {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
             var lighthouse = await db.Lighthouses.SingleOrDefaultAsync(l => l.Id == body.Lighthouse);
             if (lighthouse == null)
             {
@@ -148,9 +180,16 @@ namespace InformationRadarCore.Controllers
         }
 
         [HttpDelete("Queries/{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveQuery(int id)
         {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
             var query = await db.GoogleQueries.SingleOrDefaultAsync(q => q.Id == id);
             if (query == null)
             {

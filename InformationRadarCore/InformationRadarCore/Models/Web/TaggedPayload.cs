@@ -36,17 +36,22 @@ namespace InformationRadarCore.Models.Web
 
             foreach (var tag in Tags)
             {
-                var t = await db.Tags.SingleOrDefaultAsync(t => t.TagName == tag);
+                var t = await db.Tags
+                    .Include(t => t.Lighthouses)
+                    .SingleOrDefaultAsync(t => t.TagName == tag);
                 if (t != null)
                 {
-                    t.Lighthouses.Add(lighthouse);
+                    if (!t.Lighthouses.Contains(lighthouse))
+                    {
+                        t.Lighthouses.Add(lighthouse);
+                    }
                 }
                 else
                 {
-                    db.Tags.Add(new Tag()
+                    await db.Tags.AddAsync(new Tag()
                     {
                         TagName = tag,
-                        Lighthouses = { lighthouse }
+                        Lighthouses = new List<Lighthouse>() { lighthouse },
                     });
                 }
             }

@@ -1,17 +1,17 @@
-﻿using InformationRadarCore.Models;
+﻿using InformationRadarCore.Data;
 using InformationRadarCore.Models.Web;
+using InformationRadarCore.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
-namespace InformationRadarCore.Data
+namespace InformationRadarCore.Services
 {
     // Database helper that deals with any dynamically generated SQL tables
     // Used for creating, deleting, and reading records from lighthouses
     // Any "raw" SQL should be in this class
-    public class DynamicDb
+    public class DynDb : IDynDb
     {
         private readonly ApplicationDbContext db;
-        public DynamicDb(ApplicationDbContext db)
+        public DynDb(ApplicationDbContext db)
         {
             this.db = db;
         }
@@ -28,7 +28,7 @@ namespace InformationRadarCore.Data
 
             foreach (var (key, value) in cols)
             {
-                query += $"Field_{key} {value.SqlColumn()}";
+                query += $"Field_{key} {value.SqlColumn()},";
             }
 
             query += ");";
@@ -40,14 +40,5 @@ namespace InformationRadarCore.Data
         {
             return db.Database.ExecuteSqlRawAsync($"DROP TABLE IF EXISTS {lighthouse.InternalName}_Lighthouse;");
         }
-
-        /*public async Task<IList<JObject>> LoadRecords(Lighthouse lighthouse)
-        {
-            var records = new List<JObject>();
-
-            //db.Database.ExecuteSqlRawAsync("");
-
-            return records;
-        }*/
     }
 }

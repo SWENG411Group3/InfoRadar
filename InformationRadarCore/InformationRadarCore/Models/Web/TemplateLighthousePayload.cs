@@ -1,7 +1,5 @@
-﻿using Duende.IdentityServer.Models;
-using InformationRadarCore.Data;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace InformationRadarCore.Models.Web
 {
@@ -10,14 +8,14 @@ namespace InformationRadarCore.Models.Web
         [Required]
         public int TemplateId { get; set; }
         [Required]
-        public JObject Params { get; set; }
+        public JsonElement Params { get; set; }
 
         public string? FindInvalidParam(IList<TemplateField> fields)
         {
             foreach (var field in fields)
             {
-                var prop = Params.GetValue(field.Name);
-                if (prop == null)
+                JsonElement prop;
+                if (!Params.TryGetProperty(field.Name, out prop))
                 {
                     return field.Name;
                 }
@@ -26,20 +24,25 @@ namespace InformationRadarCore.Models.Web
                 switch (field.DataType)
                 {
                     case TemplateFieldType.StringList:
-                        okay = prop.Type == JTokenType.Array && prop.Children().All(e => e.Type == JTokenType.String);
+                        okay = prop.ValueKind == JsonValueKind.Array && prop.EnumerateArray().All(e => e.ValueKind == JsonValueKind.String);
                         break;
                     case TemplateFieldType.String:
-                        okay = prop.Type == JTokenType.String;
+                        okay = prop.ValueKind == JsonValueKind.String;
                         break;
                     case TemplateFieldType.Float:
-                        okay = prop.Type == JTokenType.Float || prop.Type == JTokenType.Integer;
+                        okay = prop.ValueKind == JsonValueKind.Number;
                         break;
                     case TemplateFieldType.Int:
-                        okay = prop.Type == JTokenType.Integer;
+                        {
+                            int o;
+                            okay = prop.TryGetInt32(out o);
+                        }
                         break;
                     case TemplateFieldType.Date:
-                        DateTime o;
-                        okay = prop.Type == JTokenType.String && DateTime.TryParse(prop.Value<string>(), out o);
+                        {
+                            DateTime o;
+                            okay = prop.TryGetDateTime(out o);
+                        }
                         break;
                 }
 

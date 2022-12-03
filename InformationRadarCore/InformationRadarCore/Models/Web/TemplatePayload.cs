@@ -6,7 +6,7 @@ namespace InformationRadarCore.Models.Web
     {
         public class FieldData
         { 
-            public TemplateFieldType Type { get; set; }
+            public string Type { get; set; }
             public string Description { get; set; }
         }
 

@@ -10,9 +10,7 @@ namespace InformationRadarCore.Data
     {
         public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions)
             : base(options, operationalStoreOptions)
-        {
-
-        }
+        {}
         public DbSet<Lighthouse> Lighthouses { get; set; }
         public DbSet<Site> Sites { get; set; }
         public DbSet<GoogleQuery> GoogleQueries { get; set; }

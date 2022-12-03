@@ -27,7 +27,8 @@ namespace InformationRadarCore.Models
         /// <summary>
         /// Lighthouse description
         /// </summary>
-        public string Description { get; set; }
+        [MaxLength(1000)]
+        public string? Description { get; set; }
 
         /// <summary>
         /// Last time the scraper ran
