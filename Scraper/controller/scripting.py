@@ -1,5 +1,4 @@
 # This module contains various helper classes / methods to be used within templates/scripts
-
 import w3lib.html
 
 def contains_keyword(response, keyword):
@@ -14,8 +13,6 @@ def number_of_elements(response, element):
 def number_of_tables(response):
     return len(response.xpath('//table'))
     
-
-
 class Table:
     def __init__(self, response, table_num):
         self._response = response

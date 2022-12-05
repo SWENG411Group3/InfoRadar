@@ -68,7 +68,8 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'scraper.pipelines.LinkPipeline' : 300,
-    'scraper.pipelines.PricePipeline': 310,
+    'scraper.pipelines.LighthouseItemPipeline' : 310,
+    'scraper.pipelines.PricePipeline': 350,
     'scraper.pipelines.JsonWriterPipeline': 400
 }
 

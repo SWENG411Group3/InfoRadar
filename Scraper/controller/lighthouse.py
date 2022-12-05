@@ -4,7 +4,7 @@
 # Wrapper for interacting with lighthouses in the DB #
 ######################################################
 
-from context import Context
+from .context import Context
 import importlib
 
 class Lighthouse:
@@ -13,7 +13,7 @@ class Lighthouse:
         self.id = id
         self.types = types
         self._orm = orm
-        self.mod = importlib.import_module("Scraper.scripts." + internal_name + "_lighthouse")
+        self.mod = importlib.import_module("scripts." + internal_name + "_lighthouse",package="Scraper")
 
     # gets all functions annotated with "visitor" decoration
     def get_visitors(self):
@@ -23,6 +23,10 @@ class Lighthouse:
     # gets all functions decorated with "messenger"
     def get_messengers(self):
         return [fnc for _, fnc in self.mod.__dict__.items() if callable(fnc) and getattr(fnc, "script_job", "") == "messenger"]
+    
+    # gets all functions decorated with "pipeline"
+    def get_pipelines(self):
+        return [fnc for _, fnc in self.mod.__dict__.items() if callable(fnc) and getattr(fnc, "script_job", "") == "pipeline"]
 
     # Invokes all visitors if last crawl date was over `Frequency` seconds
     # Invokes all messengers if last message was sent over `MessageFrequency` seconds

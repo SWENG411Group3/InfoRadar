@@ -6,7 +6,8 @@ from controller import test
 from scraper.items import LinkItem
 import controller.logger as logger
 from urllib.parse import urlparse
-from scripting import *
+from controller.scripting import *
+from controller import orm
 
 class GoogleSearch(scrapy.Spider):
     name = "Google"
@@ -31,6 +32,8 @@ class GoogleSearch(scrapy.Spider):
     def spider_opened(self, spider):
         # Retrieve the lighthouse configuration from the controller
         self.config = test.fetch_lighthouse_info(self.lighthouse_id)
+        db = orm.from_env()
+        self.lighthouse = db.get_lighthouse(self.lighthouse_id)
         #Update the starting urls
         self.start_urls = [f'https://www.google.com/search?q={self.keyword}&num={self.num}&start={self.start}']
         self.logger.info(f"{spider.name} spider was opened")

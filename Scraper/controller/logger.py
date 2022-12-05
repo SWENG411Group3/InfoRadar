@@ -23,14 +23,15 @@ def store_log(config):
     # naming convention we choose.
     # Question for group:
     # Is the database expected to have the log file name for a given lighthouse, or is it created here using the lighthouse internal name?
-    log_size = os.path.getsize(config['log']) if os.path.exists(config['log']) else 0
-    append_size = os.path.getsize(_temp_log)
-    if (log_size + append_size) >= config['max-log-size']:
-        pass
-        # Create the new file here for
-        # Question: what naming convention did we pick again?  !! <-----
+    pass
+    # log_size = os.path.getsize(config['log']) if os.path.exists(config['log']) else 0
+    # append_size = os.path.getsize(_temp_log)
+    # if (log_size + append_size) >= config['max-log-size']:
+    #     pass
+    #     # Create the new file here for
+    #     # Question: what naming convention did we pick again?  !! <-----
     
-    # Update lighthouse log
-    with (open(config['log'], 'a') as real_log, open(_temp_log, 'r') as temp_log):
-        real_log.write(temp_log.read())    
+    # # Update lighthouse log
+    # with (open(config['log'], 'a') as real_log, open(_temp_log, 'r') as temp_log):
+    #     real_log.write(temp_log.read())    
     

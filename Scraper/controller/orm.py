@@ -6,7 +6,9 @@
 
 import pyodbc
 import os
-from lighthouse import Lighthouse
+from .lighthouse import Lighthouse
+from dotenv import load_dotenv
+from importlib import invalidate_caches
 
 class Orm:
     def __init__(self, server, database, username, password):
@@ -14,7 +16,7 @@ class Orm:
         self.database = database
         self.username = username
         self.password = password
-
+        
     def connection(self):        
         return pyodbc.connect("DRIVER={ODBC Driver 17 for SQL Server};SERVER=" +
             self.server + ";DATABASE=" + self.database + ";UID=" + self.username +
@@ -36,7 +38,9 @@ class Orm:
                     # f"WHERE Id = {lighthouse_id}"
                     # #"AND COLUMN_NAME LIKE 'Field_%' GROUP BY Id, InternalName"
                 ))
-                return lh_reader.fetchall()
+                row = lh_reader.fetchone()
+                return Lighthouse(row[0])
+                
         #         for row in lh_reader.fetchall():
         #             types = {}
         #             for (name, ty) in zip(row.col_names.split(","), row.col_types.split(",")):
@@ -67,6 +71,8 @@ class Orm:
 
 def from_env():
     pyodbc.pooling = True
+    load_dotenv()
+    invalidate_caches()
     return Orm(
         os.environ.get("DB_HOST"),
         os.environ.get("DB_NAME"),

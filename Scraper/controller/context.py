@@ -44,7 +44,7 @@ class Context:
         pass
         
     # gets all records that were created within the last N seconds 
-    def recent_reords(self, seconds):
+    def recent_records(self, seconds):
         pass
 
 # Object representing the data scraped from a particular URL

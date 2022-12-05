@@ -11,6 +11,13 @@ import logging
 from scraper.items import *
 
 
+class LighthouseItemPipeline:
+    def process_item(self, item, spider):
+        if isinstance(item, LighthouseItem):
+            lh = spider.get_lighthouse()
+            for pipeline in lh.get_pipelines():
+                pipeline()
+
 class LinkPipeline:
     saved_links = []
     def process_item(self, item, spider):
@@ -26,6 +33,7 @@ class LinkPipeline:
         if spider.name == "Google":
             for link in self.saved_links:
                 logging.info(link)
+
 
 class PricePipeline:
     def process_item(self, item, spider):

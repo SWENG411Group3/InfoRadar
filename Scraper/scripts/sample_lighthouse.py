@@ -1,6 +1,9 @@
-import script_tools
-from scripting import *
+from controller import script_tools
 from controller import logger
+from controller.scripting import *
+from scraper.items import Item
+from itemadapter import ItemAdapter
+
 
 @script_tools.visitor
 def gather_data(context, response):
@@ -13,9 +16,9 @@ def gather_data(context, response):
                 # Try to retrieve value from the table
                 value = table.get_value(col, row)
                 if value is not None:
-                    price_item = PriceItem(price=value, description="{} {}".format(row, col))
+                    sample_item = Item(value=value, description="{} {}".format(row, col))
                     # Send through pipeline
-                    yield price_item
+                    yield sample_item
                 else:
                     logger.info(f"Unable to scrape item for row {row}, column {col}.")
 
@@ -24,6 +27,13 @@ def send_data(context):
     pass
 
 @script_tools.pipeline
+def process_data(item):
+    adapter = ItemAdapter(item)
+    if (adapter.get('value')):
+        logger.info("Scraped price for {}: {}".format(adapter.get('description'), adapter.get('price')))
+        # Here we can reach out to the controller and check any thresholds
+        # for now just return            
+    return item
 
 def a_secret_third_thing():
     pass
