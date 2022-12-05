@@ -13,7 +13,7 @@ class Lighthouse:
         self.id = id
         self.types = types
         self._orm = orm
-        self.mod = importlib.import_module("scripts." + internal_name + "_lighthouse")
+        self.mod = importlib.import_module("Scraper.scripts." + internal_name + "_lighthouse")
 
     # gets all functions annotated with "visitor" decoration
     def get_visitors(self):
