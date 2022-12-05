@@ -5,8 +5,20 @@
 
 import scrapy
 
+# A generic item consisting of a description and a value
+class Item(scrapy.Item):
+    value = scrapy.Field()
+    description = scrapy.Field()
+    
 # A "Price" item consisting of a description and a price
 class PriceItem(scrapy.Item):
     price = scrapy.Field()
     description = scrapy.Field()
+    
+# A link item to use when extracting links from google
+class LinkItem(scrapy.Item):
+    url = scrapy.Field()
+    text = scrapy.Field()
+    fragment = scrapy.Field()
+    nofollow = scrapy.Field()
     

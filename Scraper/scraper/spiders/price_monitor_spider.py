@@ -1,19 +1,18 @@
 import scrapy
-import w3lib.html
 import logging
 from logging import config
 from scrapy import signals
 from scraper.items import PriceItem
-from scraper.xpath_methods import *
 from controller import test
 from controller import logger
+from scraper.items import PriceItem
+from scripting import *
 
 class PriceMonitor(scrapy.Spider):
     name = "Price Monitor"
     start_urls = []
     config = {}
-    logger.configure()
-              
+    
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(PriceMonitor, cls).from_crawler(crawler, *args, **kwargs)
@@ -30,16 +29,12 @@ class PriceMonitor(scrapy.Spider):
         self.start_urls = self.config['urls']
         self.logger.info("Spider opened: {}".format(spider.name))
         
-    
     # Method called whenever a spider is closed
     def spider_closed(self, spider):
         # Handle any cleanup items here
         # TODO: retrieve the log file location from the config
-        # and copy or rename the temp_log.txt file to the correct path.
-        # So far, the logging doesn't seem to be configurable from within the "spider_open" method,
-        # but rather at the top of the class, which means the lighthouse_id is not available when the 
-        # logger is configured. 
-        pass
+        self.logger.info("Spider closed: {}".format(spider.name))
+        logger.store_log(self.config)
         
     # Method called when an error occurs within a spider
     def spider_error(self, failure, response, spider):
@@ -48,19 +43,20 @@ class PriceMonitor(scrapy.Spider):
         
     # Method that parses the request for a given url
     def parse(self, response):
-        # Create a price item for the pipeline
-        item = PriceItem()
-        for table in range(0, number_of_tables(response)):
+        # loop through each available table
+        for tbl in range(1, number_of_tables(response)+1):
+            table = Table(response, tbl)
+            # loop through the row/col values in the configuration
             for col in self.config['cols']:
                 for row in self.config['rows']:
-                    value = get_value_from_table(response, 1, col, row)
-                    trimmed_val = w3lib.html.remove_tags(value).strip()
-                    item['description'] = "{},{}".format(row, col)
-                    item['price'] = trimmed_val
-                    print(f'{row} {col}: {trimmed_val}')
-                    # yield item for pipeline(s)
-                    yield item
-                    
+                    # Try to retrieve value from the table
+                    value = table.get_value(col, row)
+                    if value is not None:
+                        price_item = PriceItem(price=value, description="{} {}".format(row, col))
+                        # Send through pipeline
+                        yield price_item
+                    else:
+                        self.logger.info(f"Unable to scrape item for row {row}, column {col}.")
         # Execute the template/user script
         #exec(self.config['script'])
         

@@ -3,21 +3,41 @@
 # It is being used solely for debugging.
 
 def fetch_lighthouse_info(id):
-    config = {'rows' : ["13 October 2022"],
-              'cols' : ["Price (US$ per kilogram)"],
+    config1 = {'rows' : ["Pittsburgh Penguins"],
+              'cols' : ["Wins","Losses"],
               'keywords' : [],
               'urls' : [
-        'https://www.lme.com/en/Metals/EV/About-Lithium'  # No headers
-        #'https://www.scrapethissite.com/pages/forms/'     # Normal
-        #'https://www.lme.com/en/Market-data/LME-reference-prices/LME-Official-Price' # Normal
-        #'https://www.gobankingrates.com/money/side-gigs/aluminum-can-prices/' # Duplicate headers
-        ],
+                        #'https://www.lme.com/en/Metals/EV/About-Lithium'  # No headers
+                        'https://www.scrapethissite.com/pages/forms/'     # Normal
+                        #'https://www.lme.com/en/Market-data/LME-reference-prices/LME-Official-Price' # Normal
+                        #'https://www.gobankingrates.com/money/side-gigs/aluminum-can-prices/' # Duplicate headers
+                       ],
               'script' : script,
-              'log' : "log.txt",
-              'log_backup_count': 5,
-              'max_log_size': 1024
+              'log' : "lighthouse_1_log_1.txt",
+              'log-backup-count': 10,
+              'max-log-size': 1024,
+              'allow-duplicates' : False
+                }
+    config2 = {'rows' : ["Pittsburgh Penguins"],
+              'cols' : ["Wins","Losses"],
+              'keywords' : [],
+              'urls' : [
+                        #'https://www.lme.com/en/Metals/EV/About-Lithium'  # No headers
+                        'https://www.scrapethissite.com/pages/forms/'     # Normal
+                        #'https://www.lme.com/en/Market-data/LME-reference-prices/LME-Official-Price' # Normal
+                        #'https://www.gobankingrates.com/money/side-gigs/aluminum-can-prices/' # Duplicate headers
+                       ],
+              'script' : script,
+              'log' : "lighthouse_1_log_3.txt",
+              'log-backup-count': 10,
+              'max-log-size': 1024,
+              'allow-duplicates' : False
     }
-    return config
+    if int(id) == 1:
+        return config1
+    else:
+        return config2
+        
 
 
 script = """

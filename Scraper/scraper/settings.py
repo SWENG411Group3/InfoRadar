@@ -19,7 +19,7 @@ USER_AGENT = 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/f
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-LOG_LEVEL = "WARNING"
+LOG_LEVEL = "INFO"
 
 REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 
@@ -67,7 +67,8 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'scraper.pipelines.PricePipeline': 300,
+    'scraper.pipelines.LinkPipeline' : 300,
+    'scraper.pipelines.PricePipeline': 310,
     'scraper.pipelines.JsonWriterPipeline': 400
 }
 
