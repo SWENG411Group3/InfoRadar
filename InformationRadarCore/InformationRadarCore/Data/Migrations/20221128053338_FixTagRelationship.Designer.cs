@@ -4,6 +4,7 @@ using InformationRadarCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InformationRadarCore.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221128053338_FixTagRelationship")]
+    partial class FixTagRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("RecipientsId");
 
-                    b.ToTable("ApplicationUserLighthouse", (string)null);
+                    b.ToTable("ApplicationUserLighthouse");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.DeviceFlowCodes", b =>
@@ -120,7 +122,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("Use");
 
-                    b.ToTable("Keys", (string)null);
+                    b.ToTable("Keys");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.PersistedGrant", b =>
@@ -197,9 +199,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -265,7 +264,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("LighthouseId");
 
-                    b.ToTable("GoogleQueries", (string)null);
+                    b.ToTable("GoogleQueries");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Lighthouse", b =>
@@ -278,10 +277,6 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("bit");
@@ -315,9 +310,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.Property<bool>("Running")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("SearchRunning")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Thumbnail")
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
@@ -332,7 +324,7 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("InternalName")
                         .IsUnique();
 
-                    b.ToTable("Lighthouses", (string)null);
+                    b.ToTable("Lighthouses");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
@@ -357,7 +349,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("LighthouseId");
 
-                    b.ToTable("Sites", (string)null);
+                    b.ToTable("Sites");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Tag", b =>
@@ -378,7 +370,7 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("TagName")
                         .IsUnique();
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Template", b =>
@@ -389,27 +381,17 @@ namespace InformationRadarCore.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(700)
-                        .HasColumnType("nvarchar(700)");
-
                     b.Property<string>("InternalName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("InternalName")
                         .IsUnique();
 
-                    b.ToTable("Templates", (string)null);
+                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.TemplateConfiguration", b =>
@@ -437,7 +419,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("TemplateConfigurations", (string)null);
+                    b.ToTable("TemplateConfigurations");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.TemplateField", b =>
@@ -470,7 +452,7 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("Name", "TemplateId")
                         .IsUnique();
 
-                    b.ToTable("TemplateFields", (string)null);
+                    b.ToTable("TemplateFields");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.TemplateLighthouseColumn", b =>
@@ -500,7 +482,7 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("Name", "TemplateId")
                         .IsUnique();
 
-                    b.ToTable("TemplateLighthouseColumns", (string)null);
+                    b.ToTable("TemplateLighthouseColumns");
                 });
 
             modelBuilder.Entity("LighthouseTag", b =>
@@ -515,7 +497,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.HasIndex("TagsTagId");
 
-                    b.ToTable("LighthouseTag", (string)null);
+                    b.ToTable("LighthouseTag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

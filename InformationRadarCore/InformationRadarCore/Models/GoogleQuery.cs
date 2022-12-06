@@ -6,7 +6,9 @@ namespace InformationRadarCore.Models
     {
         public int Id { get; set; }
 
-        public ICollection<Lighthouse> Lighthouses { get; set; }
+        [Required]
+        public Lighthouse Lighthouse { get; set; }
+        public int LighthouseId { get; set; }
 
         [Required]
         public string Query { get; set; }

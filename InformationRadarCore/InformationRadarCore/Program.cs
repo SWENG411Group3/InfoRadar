@@ -1,12 +1,14 @@
 using IdentityModel;
 using InformationRadarCore.Data;
 using InformationRadarCore.Models;
+using InformationRadarCore.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
@@ -28,13 +30,21 @@ namespace InformationRadarCore
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
                 options.SignIn.RequireConfirmedAccount = true;
             })
+                .AddRoles<IdentityRole>()
+                .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-
             builder.Services.AddAuthentication()
                 .AddIdentityServerJwt();
+
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IDynDb, DynDb>();
+
+            var configService = new ConfigService();
+            settings.Bind(configService);
+            builder.Services.AddSingleton(configService);
 
             var validIssuer = settings.GetValue<string>("ReactValidIssuer");  
             builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
@@ -58,6 +68,7 @@ namespace InformationRadarCore
                     }
                     options.TokenValidationParameters.AuthenticationType = "ApplicationCookie";
                     options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
+                    options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
                 });
 
             builder.Services.AddControllersWithViews();
@@ -80,8 +91,9 @@ namespace InformationRadarCore
             app.UseStaticFiles();
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseIdentityServer();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
@@ -91,7 +103,20 @@ namespace InformationRadarCore
 
             app.MapFallbackToFile("index.html");
 
+            Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Old", "Scripts"));
+            Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Scraper", "scripts", "templates"));
+            Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "Images"));
+
             app.Run();
+        }
+
+        public static void roleSetup(RoleManager<IdentityRole> manager)
+        {
+            // Populate DB with default roles
+            if (!manager.RoleExistsAsync("Admin").Result)
+            {
+                manager.CreateAsync(new IdentityRole("Admin")).Wait();
+            }
         }
     }
 }

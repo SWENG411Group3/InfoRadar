@@ -2,28 +2,15 @@
 
 namespace InformationRadarCore.Models
 {
-    public enum SiteContentType
-    {
-        Html,
-        Json,
-        Rss,
-        Raw,
-    }
-
     public class Site
     {
         public int Id { get; set; }
 
-        public ICollection<Lighthouse> Lighthouses { get; set; }
+        public int LighthouseId { get; set; }
+        public Lighthouse Lighthouse { get; set; }
 
         [Required]
         public string Url { get; set; }
-
-        /// <summary>
-        /// The content type that should be expected from the URL
-        /// </summary>
-        [Required]
-        public SiteContentType Content { get; set; }
 
         /// <summary>
         /// The date this site was added
