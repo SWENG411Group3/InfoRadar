@@ -86,9 +86,6 @@ namespace InformationRadarCore.Models
         [Required]
         public bool Running { get; set; } = false;
 
-        [Required]
-        public bool SearchRunning { get; set; } = false;
-
         /// <summary>
         /// App users who will recieve a message
         /// </summary>
