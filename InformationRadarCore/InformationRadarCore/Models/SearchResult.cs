@@ -2,7 +2,11 @@
 
 namespace InformationRadarCore.Models
 {
-    public class Site
+    /// <summary>
+    /// Temporary DB site list that gets passed between Spiders
+    /// Results are fetched from search query results
+    /// </summary>
+    public class SearchResult
     {
         public int Id { get; set; }
 
@@ -12,11 +16,5 @@ namespace InformationRadarCore.Models
 
         [Required, MaxLength(2048)]
         public string Url { get; set; }
-
-        /// <summary>
-        /// The date this site was added
-        /// </summary>
-        [Required]
-        public DateTime Created { get; set; }
     }
 }

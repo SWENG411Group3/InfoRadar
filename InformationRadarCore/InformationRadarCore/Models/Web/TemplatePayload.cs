@@ -23,6 +23,8 @@ namespace InformationRadarCore.Models.Web
 
         public IDictionary<string, FieldData> Fields { get; set; }
 
+        public IList<string>? Sites { get; set; }
+
         public string Code { get; set; }
     }
 }

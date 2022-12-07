@@ -284,6 +284,16 @@ namespace InformationRadarCore.Controllers
                 Thumbnail = body.Thumbnail,
             });
 
+            foreach (var url in body.ValidSites())
+            {
+                await db.Sites.AddAsync(new Site()
+                {
+                    Lighthouse = lighthouseResult.Entity,
+                    Url = url.ToString(),
+                    Created = DateTime.Now,
+                });
+            }
+
             await body.EnsureTags(db, lighthouseResult.Entity);
             await dynDb.CreateLighthouseTable(body.InternalName, columns);
 
@@ -399,6 +409,34 @@ namespace InformationRadarCore.Controllers
                 Lighthouse = lighthouseResult.Entity,
                 Template = template,
             });
+
+            var defaultSites = await db.TemplateDefaultSites
+                .Where(e => e.TemplateId == template.Id)
+                .ToListAsync();
+            foreach (var defaultSite in defaultSites)
+            {
+                await db.Sites.AddAsync(new Site()
+                {
+                    Lighthouse = lighthouseResult.Entity,
+                    Url = defaultSite.Url,
+                    Created = DateTime.Now,
+                });
+            }
+
+            // Insert any sites that aren't already in the template's default sites
+            foreach (var url in body.ValidSites())
+            {
+                var cannonical = url.ToString();
+                if (!defaultSites.Any(e => e.Url == cannonical))
+                {
+                    await db.Sites.AddAsync(new Site()
+                    {
+                        Lighthouse = lighthouseResult.Entity,
+                        Url = cannonical,
+                        Created = DateTime.Now,
+                    });
+                }
+            }
 
             await body.EnsureTags(db, lighthouseResult.Entity);
             await dynDb.CreateLighthouseTable(body.InternalName, columns);

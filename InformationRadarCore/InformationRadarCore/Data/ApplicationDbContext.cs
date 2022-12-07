@@ -20,5 +20,7 @@ namespace InformationRadarCore.Data
         public DbSet<TemplateLighthouseColumn> TemplateLighthouseColumns { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<GeneratedReport> Reports { get; set; }
+        public DbSet<SearchResult> SearchResults { get; set; }
+        public DbSet<TemplateDefaultSite> TemplateDefaultSites { get; set; }
     }
 }

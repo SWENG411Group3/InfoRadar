@@ -1,5 +1,4 @@
-﻿
-using InformationRadarCore.Services;
+﻿using InformationRadarCore.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace InformationRadarCore.Models.Web
@@ -19,6 +18,12 @@ namespace InformationRadarCore.Models.Web
         public ulong? MessengerFrequency { get; set; }
         [MaxLength(16)]
         public string? Thumbnail { get; set; }
+        public IList<string>? Sites { get; set; }
+
+        public IEnumerable<Uri> ValidSites()
+        {
+            return Sites?.Select(e => new Uri(e)) ?? Enumerable.Empty<Uri>();
+        }
 
         public bool ValidateImg(IWebHostEnvironment env, ConfigService config)
         {
