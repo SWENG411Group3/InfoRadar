@@ -286,6 +286,8 @@ namespace InformationRadarCore.Controllers
             var path = config.CustomScriptPath(lighthouseResult.Entity);
             await System.IO.File.WriteAllTextAsync(path, body.Code);
 
+            body.GenDirectories(env, config);
+            body.GenInitLog(config);
 
             await db.SaveChangesAsync();
             await db.Database.CommitTransactionAsync();
@@ -394,8 +396,10 @@ namespace InformationRadarCore.Controllers
             });
 
             await body.EnsureTags(db, lighthouseResult.Entity);
-
             await dynDb.CreateLighthouseTable(body.InternalName, columns);
+
+            body.GenDirectories(env, config);
+            body.GenInitLog(config);
 
             await db.SaveChangesAsync();
             await db.Database.CommitTransactionAsync();

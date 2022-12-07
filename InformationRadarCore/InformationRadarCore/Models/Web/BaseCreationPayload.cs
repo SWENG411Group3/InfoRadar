@@ -24,5 +24,16 @@ namespace InformationRadarCore.Models.Web
         {
             return string.IsNullOrEmpty(Thumbnail) || File.Exists(Path.Combine(env.WebRootPath, config.ImageDir, Thumbnail));
         }
+
+        public void GenDirectories(IWebHostEnvironment env, ConfigService config)
+        {
+            Directory.CreateDirectory(Path.Combine(config.ResourceRoot, "Scraper", "logs", InternalName));
+            Directory.CreateDirectory(Path.Combine(env.WebRootPath, "Reports", InternalName));
+        }
+
+        public void GenInitLog(ConfigService config)
+        {
+            File.Create(Path.Combine(config.ResourceRoot, "Scraper", "logs", InternalName, "log_0.txt")).Dispose();
+        }
     }
 }

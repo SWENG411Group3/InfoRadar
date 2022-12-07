@@ -1,18 +1,16 @@
 ﻿using InformationRadarCore.Models.Web;
 using InformationRadarCore.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InformationRadarCore.Data;
 using InformationRadarCore.Services;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InformationRadarCore.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
+    [ApiController]
     public class SearchEngineController : Controller
     {
         private readonly ApplicationDbContext db;

@@ -11,6 +11,7 @@ const context =  [
   "/.well-known",
   "/Identity",
   "/Images",
+  "/Reports",
   "/connect",
   "/ApplyDatabaseMigrations",
   "/_framework"

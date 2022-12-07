@@ -105,7 +105,9 @@ namespace InformationRadarCore
 
             Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Old", "Scripts"));
             Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Scraper", "scripts", "templates"));
-            Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "Images"));
+            Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Scraper", "logs"));
+            Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, configService.ImageDir));
+            Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, configService.ReportDir));
 
             app.Run();
         }
