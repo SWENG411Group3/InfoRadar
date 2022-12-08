@@ -42,4 +42,24 @@ class Lighthouse:
             for fnc in self.get_messengers():
                 fnc(context)
             # @TODO update last message date
-            
+    
+    def update_log_index(self, ind):
+        with self._orm.connection() as connection:
+            with connection.cursor() as lh_writer:
+                lh_writer.execute(("UPDATE Lighthouses "    
+                                   "SET LatestLog = {ind} "
+                                   f"WHERE Id = {self.id}"))
+    
+    def update_error_state(self, errorState):
+        with self._orm.connection() as connection:
+            with connection.cursor() as lh_writer:
+                lh_writer.execute(("UPDATE Lighthouses "    
+                                   f"SET HasError = {int(errorState)} "
+                                   f"WHERE Id = {self.id}"))
+                
+    def get_urls(self):
+        pass
+    # Query google queries table, join GoogleQueries.LighthouseId = self.id
+    # Query sites tables, 
+    
+    

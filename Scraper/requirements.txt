@@ -1,8 +1,4 @@
 beautifulsoup4
 pyodbc
-<<<<<<< HEAD
 python-dotenv
 scrapy
-=======
-python-dotenv
->>>>>>> 576c759a576db8fd73b50285a1485bbec3055e3a

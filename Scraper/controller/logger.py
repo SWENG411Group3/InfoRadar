@@ -1,6 +1,5 @@
 import os
 import logging
-from logging.handlers import RotatingFileHandler
 from scrapy.utils.log import configure_logging
 
 _temp_log = "temp_log.txt"
@@ -16,22 +15,67 @@ def configure():
         format='%(asctime)-4s %(levelname)-8s %(message)s',
         level = logging.INFO)
     
-def store_log(config):
-    #TODO: 
-    # Check <file> for size constraints. If <file> is not over the size limit then append
-    # "temp_log.txt" to <file>. If <file> is over the limit, create a new file following whatever
-    # naming convention we choose.
-    # Question for group:
-    # Is the database expected to have the log file name for a given lighthouse, or is it created here using the lighthouse internal name?
-    pass
-    # log_size = os.path.getsize(config['log']) if os.path.exists(config['log']) else 0
-    # append_size = os.path.getsize(_temp_log)
-    # if (log_size + append_size) >= config['max-log-size']:
-    #     pass
-    #     # Create the new file here for
-    #     # Question: what naming convention did we pick again?  !! <-----
+def update_log(lighthouse):
+    current_log = get_latest_log(lighthouse.internal_name)
+    log_size = os.path.getsize(current_log)
+    append_size = os.path.getsize(_temp_log)
+    combined_size = log_size + append_size
+    if (combined_size) > _max_log_size:
+        # Need a new file, but first write what we can
+        remaining_bytes = _max_log_size - log_size
+        with (open(current_log, 'a') as log, open(_temp_log,'r') as temp):
+            lines = []
+            # Write log lines until we reach the threshold
+            while len("".join(lines).encode()) < remaining_bytes:
+                lines.append(temp.readline())
+            # Discard the last entry since it's over the threshold and 
+            # store the proper file position for the next file
+            last = lines.pop()
+            start_pos = temp.tell() - len(last.encode()) - 1
+            log.write("".join(lines))
+        # Log is filled, rollover to next file
+        current_log = _increment_log(lighthouse.internal_name)
+        # Write remaining logs to the newer file
+        with (open(current_log, 'a') as log, open(_temp_log,'r') as temp):
+            temp.seek(start_pos)
+            log.write(temp.read())
+        # Update the database 
+        lighthouse.update_log_index(_get_log_index(current_log))
+    else:
+        # We have room still, write entire temp log
+        with (open(current_log, 'a') as log, open(_temp_log,'r') as temp):
+            log.write(temp.read())
+
+def get_latest_log(lighthouse_name):
+    log_dir = os.path.join("logs", lighthouse_name)
+    # Check if log directory exists
+    if not os.path.isdir(log_dir):
+        os.mkdir(log_dir)
+    logs = os.listdir(log_dir)
+    # Check if log_0 already exists
+    if len(logs) == 0:
+        latest_log = _create_log(lighthouse_name)
+    else:
+        latest_log = os.path.join(log_dir, logs[-1])
+    return latest_log
     
-    # # Update lighthouse log
-    # with (open(config['log'], 'a') as real_log, open(_temp_log, 'r') as temp_log):
-    #     real_log.write(temp_log.read())    
+def _create_log(lh_name):
+    log_dir = os.path.join("logs", lh_name)
+    log_file = os.path.join(log_dir, "log_0.txt")
+    with open(os.path.join(log_file), 'w'):
+        pass
+    return log_file
+
+def _increment_log(lh_name):
+    # Get current log name
+    current = os.path.basename(get_latest_log(lh_name))
+    new_ind = _get_log_index(current) + 1
+    # Create the new file
+    new_log_file = os.path.join("logs", lh_name, f"log_{new_ind}.txt")
+    with open(new_log_file, 'w'):
+        pass
+    return new_log_file
+
+def _get_log_index(log):
+    return int(os.path.basename(log).strip('.txt').split('_')[-1])
     

@@ -28,11 +28,14 @@ class LighthouseSpider(scrapy.Spider):
         # Retrieve the lighthouse configuration from the controller
         #self.lighthouse = test.fetch_lighthouse_info(self.lighthouse_id)
         db = orm.from_env()
-        self.lighthouse = db.get_lighthouse(self.lighthouse_id)
+        for i in db.get_lighthouses():
+            print(i)
+        #self.lighthouse = db.get_lighthouse(self.lighthouse_id)
+        # notify database that spider is running
         
         #self.lighthouse = db.get_lighthouse(self.lighthouse_id)
         #Update the starting urls
-        #self.start_urls = self.config['urls']
+        #self.start_urls = lighthouse.get_urls()
         self.logger.info("Spider opened: {}".format(spider.name))
         
     # Method called whenever a spider is closed
@@ -40,7 +43,12 @@ class LighthouseSpider(scrapy.Spider):
         # Handle any cleanup items here
         # TODO: retrieve the log file location from the config
         self.logger.info("Spider closed: {}".format(spider.name))
-        logger.store_log(self.config)
+        print(logger.get_latest_log('sample'))
+        for i in range(500):
+            pass
+            #self.logger.info(f"fake log{i}")
+        #logger.update_log('sample')
+        # notify database that spider is not running
         
     # Method called when an error occurs within a spider
     def spider_error(self, failure, response, spider):
@@ -56,5 +64,5 @@ class LighthouseSpider(scrapy.Spider):
         print(self.lighthouse)
         # visitors = self.lighthouse.get_visitors()
         # for visitor in visitors:
-        #     visitor(context(self.lighthouse), response)
+            # visitor(Context(self.lighthouse), response)
         

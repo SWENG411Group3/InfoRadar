@@ -29,13 +29,11 @@ class Orm:
         with self.connection() as connection:
             with connection.cursor() as lh_reader:
                 lh_reader.execute((
-                    f"SELECT * FROM lighthouses WHERE Id = {lighthouse_id}"
                     # "SELECT id, InternalName AS internal,"
                     # "STRING_AGG(COLUMN_NAME, ',') AS col_names,"
                     # "STRING_AGG(DATA_TYPE, ',') AS col_types FROM lighthouses "
                     # "JOIN INFORMATION_SCHEMA.COLUMNS ON "
                     # "table_name = lighthouses.InternalName + '_lighthouse' "
-                    # f"WHERE Id = {lighthouse_id}"
                     # #"AND COLUMN_NAME LIKE 'Field_%' GROUP BY Id, InternalName"
                 ))
                 row = lh_reader.fetchone()

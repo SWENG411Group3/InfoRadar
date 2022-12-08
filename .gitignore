@@ -1,4 +1,5 @@
 InformationRadarCore/.vs
 .env
 __pycache__
+pyenv
 InfoRadar.code-workspace

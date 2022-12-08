@@ -1,7 +1,7 @@
 from controller import script_tools
 from controller import logger
 from controller.scripting import *
-from scraper.items import Item
+from scraper.items import LighthouseItem
 from itemadapter import ItemAdapter
 
 
@@ -16,7 +16,7 @@ def gather_data(context, response):
                 # Try to retrieve value from the table
                 value = table.get_value(col, row)
                 if value is not None:
-                    sample_item = Item(value=value, description="{} {}".format(row, col))
+                    sample_item = LighthouseItem(value=value, description="{} {}".format(row, col))
                     # Send through pipeline
                     yield sample_item
                 else:
@@ -24,6 +24,8 @@ def gather_data(context, response):
 
 @script_tools.messenger
 def send_data(context):
+    # this function will be invoked by run_messenger.py and fed a list of "unchecked" records
+    # the user will be responsible for checking the thresholds and sending a notification if required
     pass
 
 @script_tools.pipeline
