@@ -9,7 +9,6 @@
         public bool Enabled { get; set; }
         public bool HasError { get; set; }
         public bool Running { get; set; }
-        public bool SearchRunning { get; set; }
         public bool Subscribed { get; set; }
         public string? Thumbnail { get; set; }
     }

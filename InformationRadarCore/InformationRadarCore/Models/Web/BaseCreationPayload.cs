@@ -1,5 +1,4 @@
-﻿
-using InformationRadarCore.Services;
+﻿using InformationRadarCore.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace InformationRadarCore.Models.Web
@@ -19,10 +18,27 @@ namespace InformationRadarCore.Models.Web
         public ulong? MessengerFrequency { get; set; }
         [MaxLength(16)]
         public string? Thumbnail { get; set; }
+        public IList<string>? Sites { get; set; }
+
+        public IEnumerable<Uri> ValidSites()
+        {
+            return Sites?.Select(e => new Uri(e)) ?? Enumerable.Empty<Uri>();
+        }
 
         public bool ValidateImg(IWebHostEnvironment env, ConfigService config)
         {
             return string.IsNullOrEmpty(Thumbnail) || File.Exists(Path.Combine(env.WebRootPath, config.ImageDir, Thumbnail));
+        }
+
+        public void GenDirectories(IWebHostEnvironment env, ConfigService config)
+        {
+            Directory.CreateDirectory(Path.Combine(config.ResourceRoot, "Scraper", "logs", InternalName));
+            Directory.CreateDirectory(Path.Combine(env.WebRootPath, "Reports", InternalName));
+        }
+
+        public void GenInitLog(ConfigService config)
+        {
+            File.Create(Path.Combine(config.ResourceRoot, "Scraper", "logs", InternalName, "log_0.txt")).Dispose();
         }
     }
 }

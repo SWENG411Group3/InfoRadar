@@ -43,7 +43,7 @@ namespace InformationRadarCore.Controllers
             else if (!tagNames.Any() && string.IsNullOrWhiteSpace(query.Search))
             {
                 return BadRequest(new
-                { 
+                {
                     Message = "Either tags or search query required"
                 });
             }
@@ -85,7 +85,6 @@ namespace InformationRadarCore.Controllers
                     HasError = e.HasError,
                     Enabled = e.Enabled,
                     Running = e.Running,
-                    SearchRunning = e.SearchRunning,
                     Subscribed = e.Recipients.AsEnumerable().Any(user => user.Id == User.GetDisplayName()),
                     Thumbnail = e.Thumbnail,
                 })
@@ -111,7 +110,6 @@ namespace InformationRadarCore.Controllers
                     HasError = e.HasError,
                     Enabled = e.Enabled,
                     Running = e.Running,
-                    SearchRunning = e.SearchRunning,
                     Subscribed = e.Recipients.Any(user => user.Id == User.GetDisplayName()),
                     Thumbnail = e.Thumbnail,
                 })
@@ -132,29 +130,36 @@ namespace InformationRadarCore.Controllers
         {
             var lighthouse = await db.Lighthouses
                 .Select(e => new
-                { 
-                    e.Id, e.InternalName, e.Created,
-                    e.Title, e.Description,
-                    e.Running, e.SearchRunning,
-                    e.Frequency, e.MessengerFrequency,
-                    e.LastSentMessage, e.LastUpdated, e.LastVisitorRun,
-                    e.LatestLog, e.HasError,
+                {
+                    e.Id,
+                    e.InternalName,
+                    e.Created,
+                    e.Title,
+                    e.Description,
+                    e.Running,
+                    e.Frequency,
+                    e.MessengerFrequency,
+                    e.LastSentMessage,
+                    e.LastUpdated,
+                    e.LastVisitorRun,
+                    e.LatestLog,
+                    e.HasError,
                     e.Thumbnail,
-                    Tags = e.Tags.Select(e => new 
-                        {
-                            Id = e.TagId,
-                            Value = e.TagName,
-                        }).ToList(),
-                    Sites = e.Sites.Select(e => new 
-                        { 
-                            e.Id,
-                            Value = e.Url,
-                        }).ToList(),
-                    Queries = e.GoogleQueries.Select(e => new 
-                        { 
-                            e.Id, 
-                            Value = e.Query, 
-                        }).ToList(),
+                    Tags = e.Tags.Select(e => new
+                    {
+                        Id = e.TagId,
+                        Value = e.TagName,
+                    }).ToList(),
+                    Sites = e.Sites.Select(e => new
+                    {
+                        e.Id,
+                        Value = e.Url,
+                    }).ToList(),
+                    Queries = e.GoogleQueries.Select(e => new
+                    {
+                        e.Id,
+                        Value = e.Query,
+                    }).ToList(),
                     Subscribers = e.Recipients.Count(),
                     Subscribed = e.Recipients.Any(user => user.Id == User.GetDisplayName()),
 
@@ -186,7 +191,7 @@ namespace InformationRadarCore.Controllers
             if (lighthouse == null)
             {
                 return NotFound(new
-                { 
+                {
                     Message = $"Lighthouse with ID \"{id}\" not found"
                 });
             }
@@ -263,7 +268,7 @@ namespace InformationRadarCore.Controllers
                     Message = $"Thumbnail {body.Thumbnail} not found",
                 });
             }
-            
+
             // Data insertion
             await db.Database.BeginTransactionAsync();
 
@@ -279,6 +284,16 @@ namespace InformationRadarCore.Controllers
                 Thumbnail = body.Thumbnail,
             });
 
+            foreach (var url in body.ValidSites())
+            {
+                await db.Sites.AddAsync(new Site()
+                {
+                    Lighthouse = lighthouseResult.Entity,
+                    Url = url.ToString(),
+                    Created = DateTime.Now,
+                });
+            }
+
             await body.EnsureTags(db, lighthouseResult.Entity);
             await dynDb.CreateLighthouseTable(body.InternalName, columns);
 
@@ -286,6 +301,8 @@ namespace InformationRadarCore.Controllers
             var path = config.CustomScriptPath(lighthouseResult.Entity);
             await System.IO.File.WriteAllTextAsync(path, body.Code);
 
+            body.GenDirectories(env, config);
+            body.GenInitLog(config);
 
             await db.SaveChangesAsync();
             await db.Database.CommitTransactionAsync();
@@ -387,15 +404,45 @@ namespace InformationRadarCore.Controllers
             });
 
             await db.TemplateConfigurations.AddAsync(new TemplateConfiguration()
-            { 
+            {
                 Payload = body.Params.ToString(),
                 Lighthouse = lighthouseResult.Entity,
                 Template = template,
             });
 
-            await body.EnsureTags(db, lighthouseResult.Entity);
+            var defaultSites = await db.TemplateDefaultSites
+                .Where(e => e.TemplateId == template.Id)
+                .ToListAsync();
+            foreach (var defaultSite in defaultSites)
+            {
+                await db.Sites.AddAsync(new Site()
+                {
+                    Lighthouse = lighthouseResult.Entity,
+                    Url = defaultSite.Url,
+                    Created = DateTime.Now,
+                });
+            }
 
+            // Insert any sites that aren't already in the template's default sites
+            foreach (var url in body.ValidSites())
+            {
+                var cannonical = url.ToString();
+                if (!defaultSites.Any(e => e.Url == cannonical))
+                {
+                    await db.Sites.AddAsync(new Site()
+                    {
+                        Lighthouse = lighthouseResult.Entity,
+                        Url = cannonical,
+                        Created = DateTime.Now,
+                    });
+                }
+            }
+
+            await body.EnsureTags(db, lighthouseResult.Entity);
             await dynDb.CreateLighthouseTable(body.InternalName, columns);
+
+            body.GenDirectories(env, config);
+            body.GenInitLog(config);
 
             await db.SaveChangesAsync();
             await db.Database.CommitTransactionAsync();
@@ -453,7 +500,7 @@ namespace InformationRadarCore.Controllers
             await db.Database.CommitTransactionAsync();
 
             if (current != null)
-            { 
+            {
                 System.IO.File.Delete(current);
             }
 
@@ -474,8 +521,8 @@ namespace InformationRadarCore.Controllers
             var lighthouse = await db.Lighthouses.SingleOrDefaultAsync(l => l.Id == id);
             if (lighthouse == null)
             {
-                return NotFound(new 
-                { 
+                return NotFound(new
+                {
                     Message = $"No lighthouse with id {id}"
                 });
             }
@@ -521,7 +568,7 @@ namespace InformationRadarCore.Controllers
             if (tag == null)
             {
                 return NotFound(new
-                { 
+                {
                     Message = $"No tag with ID \"{tagId}\" found"
                 });
             }
@@ -569,5 +616,30 @@ namespace InformationRadarCore.Controllers
             return Ok();
         }
 
+        [HttpPatch("{id}/Resolve")]
+        public async Task<IActionResult> ResolveLighthouse(int id)
+        {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
+            var lighthouse = await db.Lighthouses.SingleOrDefaultAsync(l => l.Id == id);
+            if (lighthouse == null)
+            {
+                return NotFound(new
+                {
+                    Message = $"No lighthouse with id {id}"
+                });
+            }
+
+            lighthouse.HasError = false;
+            await db.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

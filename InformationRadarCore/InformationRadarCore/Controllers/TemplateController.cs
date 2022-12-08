@@ -160,6 +160,18 @@ namespace InformationRadarCore.Controllers
                 });
             }
 
+            if (body.Sites != null)
+            {
+                foreach (var url in body.Sites.Select(e => new Uri(e)))
+                {
+                    await db.TemplateDefaultSites.AddAsync(new TemplateDefaultSite()
+                    {
+                        Url = url.ToString(),
+                        Template = tmp.Entity,
+                    });
+                }
+            }
+
             await db.SaveChangesAsync();
 
             return Ok(new

@@ -86,18 +86,14 @@ namespace InformationRadarCore.Models
         [Required]
         public bool Running { get; set; } = false;
 
-        [Required]
-        public bool SearchRunning { get; set; } = false;
-
         /// <summary>
         /// App users who will recieve a message
         /// </summary>
         public ICollection<ApplicationUser> Recipients { get; set; }
-
         public ICollection<GoogleQuery> GoogleQueries { get; set; }
-
         public ICollection<Site> Sites { get; set; }
         public ICollection<Tag> Tags { get; set; } 
+        public ICollection<GeneratedReport> Reports { get; set; }
 
         public TemplateConfiguration? TemplateConfig { get; set; }
     }

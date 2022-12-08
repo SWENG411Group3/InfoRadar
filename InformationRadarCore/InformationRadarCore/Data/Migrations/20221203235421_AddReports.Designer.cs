@@ -4,6 +4,7 @@ using InformationRadarCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InformationRadarCore.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221203235421_AddReports")]
+    partial class AddReports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,6 +346,9 @@ namespace InformationRadarCore.Data.Migrations
                     b.Property<bool>("Running")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("SearchRunning")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Thumbnail")
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
@@ -359,29 +364,6 @@ namespace InformationRadarCore.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Lighthouses");
-                });
-
-            modelBuilder.Entity("InformationRadarCore.Models.SearchResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("LighthouseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LighthouseId");
-
-                    b.ToTable("SearchResults");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
@@ -400,8 +382,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -488,29 +469,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("TemplateId");
 
                     b.ToTable("TemplateConfigurations");
-                });
-
-            modelBuilder.Entity("InformationRadarCore.Models.TemplateDefaultSite", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TemplateId");
-
-                    b.ToTable("TemplateDefaultSites");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.TemplateField", b =>
@@ -765,17 +723,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.Navigation("Lighthouse");
                 });
 
-            modelBuilder.Entity("InformationRadarCore.Models.SearchResult", b =>
-                {
-                    b.HasOne("InformationRadarCore.Models.Lighthouse", "Lighthouse")
-                        .WithMany()
-                        .HasForeignKey("LighthouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lighthouse");
-                });
-
             modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
                 {
                     b.HasOne("InformationRadarCore.Models.Lighthouse", "Lighthouse")
@@ -802,17 +749,6 @@ namespace InformationRadarCore.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Lighthouse");
-
-                    b.Navigation("Template");
-                });
-
-            modelBuilder.Entity("InformationRadarCore.Models.TemplateDefaultSite", b =>
-                {
-                    b.HasOne("InformationRadarCore.Models.Template", "Template")
-                        .WithMany()
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Template");
                 });
