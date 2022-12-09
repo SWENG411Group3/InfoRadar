@@ -1,19 +1,11 @@
 import scrapy
-import logging
-from logging import config
 from scrapy import signals
-from scraper.items import PriceItem
-from controller import test
 from controller import logger
-from scraper.items import PriceItem
 from controller import orm
-from controller import context
+import logging
 
 class LighthouseSpider(scrapy.Spider):
     name = "Lighthouse Spider"
-    start_urls = ['https://www.lme.com/en/Metals/EV/About-Lithium']
-    config = {}
-    lighthouse = None
     
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -23,46 +15,49 @@ class LighthouseSpider(scrapy.Spider):
         crawler.signals.connect(spider.spider_error,  signal=signals.spider_error)
         return spider
     
+    def start_requests(self):
+        for url in self.start_urls:
+            yield scrapy.Request(url, callback=self.parse,
+                                 errback=self.errback)
+    
     # Method called whenever a spider is opened
     def spider_opened(self, spider):
+        self.logger.info("Spider opened")
         # Retrieve the lighthouse configuration from the controller
-        #self.lighthouse = test.fetch_lighthouse_info(self.lighthouse_id)
         db = orm.from_env()
-        for i in db.get_lighthouses():
-            print(i)
-        #self.lighthouse = db.get_lighthouse(self.lighthouse_id)
+        self.logger.info("Retrieving lighthouse")
+        self.lighthouse = db.get_lighthouse(self.lighthouse_id)
+        self.logger.info(f"Running {self.lighthouse.internal_name}_lighthouse")
+        self.lighthouse.notify_running(True)
+        self.start_urls = self.lighthouse.get_urls()
         # notify database that spider is running
-        
-        #self.lighthouse = db.get_lighthouse(self.lighthouse_id)
-        #Update the starting urls
-        #self.start_urls = lighthouse.get_urls()
-        self.logger.info("Spider opened: {}".format(spider.name))
         
     # Method called whenever a spider is closed
     def spider_closed(self, spider):
-        # Handle any cleanup items here
-        # TODO: retrieve the log file location from the config
-        self.logger.info("Spider closed: {}".format(spider.name))
-        print(logger.get_latest_log('sample'))
-        for i in range(500):
-            pass
-            #self.logger.info(f"fake log{i}")
-        #logger.update_log('sample')
+        self.logger.info("Spider closed")
+        # Update the lighthouse logs
+        logger.update_log(self.lighthouse)
         # notify database that spider is not running
+        self.lighthouse.notify_running(False)
         
     # Method called when an error occurs within a spider
     def spider_error(self, failure, response, spider):
         # Handle errors here
         self.logger.error(failure)
-    
-    # Method for retrieving the underlying lighthouse object from outside the spider    
-    def get_lighthouse(self):
-        return self.lighthouse
+        self.lighthouse.set_error_state(True)
     
     # Method that parses the request for a given url
     def parse(self, response):
-        print(self.lighthouse)
-        # visitors = self.lighthouse.get_visitors()
-        # for visitor in visitors:
-            # visitor(Context(self.lighthouse), response)
+        visitors = self.lighthouse.get_visitors()
+        data = []
+        for visitor in visitors:
+            data.append(visitor(response, self.logger))
+        # Make sure we have one full list of data
+        for item in data:
+            yield(item)
+    
+    # Callback method for handling errors that occur during the Request
+    def errback(self, failure):
+        # log all failures
+        self.logger.error(repr(failure))
         

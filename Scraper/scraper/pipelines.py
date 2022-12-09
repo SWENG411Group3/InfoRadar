@@ -14,11 +14,11 @@ from scraper.items import *
 class LighthouseItemPipeline:
     def process_item(self, item, spider):
         if isinstance(item, LighthouseItem):
-            lh = spider.get_lighthouse()
-            for pipeline in lh.get_pipelines():
-                pipeline()
+            for pipeline in spider.lighthouse.get_pipelines():
+                pipeline(item, spider.logger)
 
 class LinkPipeline:
+    MAX_LATENCY = 1.0
     saved_links = []
     def process_item(self, item, spider):
         if isinstance(item, LinkItem):
@@ -26,13 +26,20 @@ class LinkPipeline:
             # process the google search result link here
             # any links that will be saved need to be appended
             # to the links list
-            self.saved_links.append(item['url'])
+            latency = adapter.get('latency')
+            if latency < self.MAX_LATENCY:
+                self.saved_links.append(adapter.get('url'))
         return item
-    
+
+    def open_spider(self, spider):
+        if spider.name == "Google Spider":
+            self.saved_links.clear()
+
     def close_spider(self, spider):
-        if spider.name == "Google":
+        if spider.name == "Google Spider":
+            spider.logger.info(f"{len(self.saved_links)} links passed latency requirement")
             for link in self.saved_links:
-                logging.info(link)
+                spider.lighthouse.update_search_results(link)
 
 
 class PricePipeline:

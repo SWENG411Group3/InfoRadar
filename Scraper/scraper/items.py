@@ -21,4 +21,5 @@ class LinkItem(scrapy.Item):
     text = scrapy.Field()
     fragment = scrapy.Field()
     nofollow = scrapy.Field()
+    latency = scrapy.Field()
     

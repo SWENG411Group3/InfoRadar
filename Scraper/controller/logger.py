@@ -6,13 +6,15 @@ _temp_log = "temp_log.txt"
 _max_log_size = (1024 * 1000) * 10 #MB
 
 def configure():
+    if not os.path.isdir("logs"):
+        os.mkdir("logs")
     if os.path.exists(_temp_log):
         os.remove(_temp_log)
     configure_logging(install_root_handler=False)
     logging.basicConfig(
         filename = _temp_log,
         filemode = 'a',
-        format='%(asctime)-4s %(levelname)-8s %(message)s',
+        format='%(asctime)-4s [%(name)s] %(levelname)-8s %(message)s',
         level = logging.INFO)
     
 def update_log(lighthouse):
@@ -40,7 +42,7 @@ def update_log(lighthouse):
             temp.seek(start_pos)
             log.write(temp.read())
         # Update the database 
-        lighthouse.update_log_index(_get_log_index(current_log))
+        lighthouse.set_log_index(_get_log_index(current_log))
     else:
         # We have room still, write entire temp log
         with (open(current_log, 'a') as log, open(_temp_log,'r') as temp):

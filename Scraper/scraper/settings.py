@@ -69,8 +69,6 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 ITEM_PIPELINES = {
     'scraper.pipelines.LinkPipeline' : 300,
     'scraper.pipelines.LighthouseItemPipeline' : 310,
-    'scraper.pipelines.PricePipeline': 350,
-    'scraper.pipelines.JsonWriterPipeline': 400
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

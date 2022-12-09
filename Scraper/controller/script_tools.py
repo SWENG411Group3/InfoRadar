@@ -19,3 +19,4 @@ def messenger(fnc):
 # Python decorator for designating pipeline functions
 def pipeline(fnc):
     fnc.script_job = "pipeline"
+    return fnc
