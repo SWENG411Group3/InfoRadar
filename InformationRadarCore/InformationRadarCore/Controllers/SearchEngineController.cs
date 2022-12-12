@@ -81,14 +81,17 @@ namespace InformationRadarCore.Controllers
                 });
             }
 
-            db.Sites.Add(new Site()
+            var siteResult = await db.Sites.AddAsync(new Site()
             {
                 Lighthouse = lighthouse,
                 Url = cannonical,
             });
             await db.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new
+            {
+                siteResult.Entity.Id,
+            });
         }
 
         [HttpDelete("Sites/{id}")]
@@ -167,14 +170,18 @@ namespace InformationRadarCore.Controllers
                 });
             }
 
-            db.GoogleQueries.Add(new GoogleQuery
+            var queryResult = await db.GoogleQueries.AddAsync(new GoogleQuery
             {
                 Lighthouse = lighthouse,
                 Query = query,
+                NumResults = body.NumResults,
             });
             await db.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new
+            { 
+                queryResult.Entity.Id,
+            });
         }
 
         [HttpDelete("Queries/{id}")]
@@ -198,6 +205,32 @@ namespace InformationRadarCore.Controllers
             }
 
             db.GoogleQueries.Remove(query);
+            await db.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPatch("Queries/{id}/Results")]
+        public async Task<IActionResult> ChangeQueryNumResults(int id, [FromBody] PatchSearchQuery body)
+        {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
+            var query = await db.GoogleQueries.SingleOrDefaultAsync(q => q.Id == id);
+            if (query == null)
+            {
+                return NotFound(new
+                {
+                    Message = $"No query with ID {id} found"
+                });
+            }
+
+            query.NumResults = body.NumResults;
             await db.SaveChangesAsync();
 
             return Ok();
