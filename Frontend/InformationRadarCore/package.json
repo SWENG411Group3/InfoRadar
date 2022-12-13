@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.10.16",
+    "@mui/material": "^5.10.16",
+    "@mui/x-data-grid": "^5.17.13",
+    "mui": "^0.0.1"
+  },
+  "devDependencies": {
+    "sass": "^1.56.1"
+  }
+}

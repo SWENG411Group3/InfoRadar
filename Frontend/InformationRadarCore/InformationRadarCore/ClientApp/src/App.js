@@ -1,23 +1,27 @@
-import React, { Component } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import AppRoutes from './AppRoutes';
-import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
-import { Layout } from './components/Layout';
-import './custom.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-export default class App extends Component {
-  static displayName = App.name;
+import { useContext } from "react";
+import { DarkModeContext } from "./context/darkModeContext";
+import List from "./pages/list/List";
 
-  render() {
+function App() {
+    const { darkMode } = useContext(DarkModeContext);
+
     return (
-      <Layout>
-        <Routes>
-          {AppRoutes.map((route, index) => {
-            const { element, requireAuth, ...rest } = route;
-            return <Route key={index} {...rest} element={requireAuth ? <AuthorizeRoute {...rest} element={element} /> : element} />;
-          })}
-        </Routes>
-      </Layout>
+        <div className={darkMode ? "app dark" : "app"}>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" >
+                        <Route path="/" element={<List />}>
+                            <Route
+                                index
+                            />
+                        </Route>
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+        </div>
     );
-  }
 }
+
+export default App;
