@@ -2,11 +2,12 @@ import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizati
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
 import { Home } from "./components/Home";
+import List from "./pages/list/List";
 
 const AppRoutes = [
   {
     index: true,
-    element: <Home />
+    element: <List />
   },
   {
     path: '/counter',
