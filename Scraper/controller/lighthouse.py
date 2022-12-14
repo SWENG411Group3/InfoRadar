@@ -17,6 +17,7 @@ class Lighthouse:
         self._orm = orm
         self.logger = logging.getLogger(f"{self.internal_name}_lighthouse")
         self.scriptmod = importlib.import_module("scripts." + internal_name + "_lighthouse", package="Scraper")
+        self.fields = self._get_fields()
         try:
             self.templatemod = importlib.import_module("scripts.templates." + internal_name + "_lighthouse", package="Scraper")
             self.has_template = True
@@ -52,6 +53,14 @@ class Lighthouse:
     def _get_scripts(self, mod, attr, name):
         return [fnc for _, fnc in mod.__dict__.items() if callable(fnc) and getattr(fnc, attr, "") == name]
     
+    def _get_fields(self):
+        table_name = f"{self.internal_name}_Lighthouse"
+        with self._orm.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.columns(table=table_name)
+                rows = cursor.fetchall()
+                return [row[3] for row in rows[2:]]
+    
     def set_log_index(self, ind):
         query = """UPDATE Lighthouses
                    SET LatestLog = ?
@@ -80,6 +89,26 @@ class Lighthouse:
         google_queries = self._execute_query(query, [self.id], fetch=True)
         return [query[0] for query in google_queries]
         
+    def get_last_sent_message(self):
+        query = "SELECT LastSentMessage FROM Lighthouses WHERE Id = ?"
+        last_sent = self._execute_query(query, [self.id], fetch=True)
+        return last_sent[0][0] if last_sent is not None else None
+        
+    def get_unchecked_records(self, timestamp):
+        query = f"SELECT * FROM {self.internal_name}_Lighthouse WHERE Created > ?"
+        entries = self._execute_query(query, [timestamp], fetch=True)
+        unchecked_records = []
+        for entry in entries:
+            # Extract the id and created timestamp
+            id = entry[0]
+            created = entry[1]
+            field_value_pairs = []
+            field_values = entry[2:]
+            for i in range(len(field_values)):
+                field_value_pairs.append( (self.fields[i],field_values[i]) )
+            unchecked_records.append({'id':id, 'created':created,'values':field_value_pairs})
+        return unchecked_records
+    
     def notify_running(self, state):
         query = "UPDATE Lighthouses SET Running = ?"
         self._execute_query(query, [int(state)])
@@ -90,6 +119,12 @@ class Lighthouse:
                    WHERE Id = ?"""
         self._execute_query(query, [datetime.utcnow(), self.id])
         
+    def set_last_message(self,utc):
+        query = """UPDATE Lighthouses
+                   SET LastSentMessage = ?
+                   WHERE Id = ?"""
+        self._execute_query(query, [datetime.utcnow(), self.id])
+
     # Retrieves the template configuration for this lighthouse.
     # This method assumes that the has_template property is True
     # and will set the error state to True if no template config is found.
@@ -124,7 +159,6 @@ class Lighthouse:
                         return lh_writer.fetchall()
                 except Exception as err:
                     self.logger.error(f"{err}\t{query}")
-                    self.update_error_state(True)
+                    self.set_error_state(True)
                     return False
         return True
-                

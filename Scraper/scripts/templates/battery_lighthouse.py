@@ -36,7 +36,8 @@ def process_data(item, logger):
     return item
 
 @script_tools.messenger
-def send_data(values, logger):
+def send_data(values, payload, logger):
     for val in values:
         logger.info(f'processing record:\tname: {val[0]}\tvalue: {val[1]}')
+    logger.info(payload)
     #raise Exception("AHHHHH!!")

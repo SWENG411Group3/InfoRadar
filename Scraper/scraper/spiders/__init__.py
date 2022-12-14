@@ -21,4 +21,4 @@ logging.getLogger('scrapy').propagate = False
 
 # Configure the default logger to be used by all spiders/pipelines
 from controller import logger
-logger.configure()
+logger.configure_logger()

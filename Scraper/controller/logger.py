@@ -5,7 +5,7 @@ from scrapy.utils.log import configure_logging
 _temp_log = "temp_log.txt"
 _max_log_size = (1024 * 1000) * 10 #MB
 
-def configure():
+def configure_logger():
     if not os.path.isdir("logs"):
         os.mkdir("logs")
     if os.path.exists(_temp_log):
