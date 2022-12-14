@@ -62,9 +62,7 @@ class GoogleSearch(scrapy.Spider):
         list_of_links = links[:10] if len(potential_links) > 10 else potential_links
         self.logger.info(f"Scraped {len(list_of_links)} links from {response.url}")
         for link in list_of_links:
-           # print(link.url)
             if not link.nofollow:
-                print(link.url)
                 # Create new request and send response to follow_link prior to pipeline
                 yield scrapy.Request(link.url, callback=self.follow_link, 
                                      errback=self.on_error, cb_kwargs={'url'  : link.url,
@@ -76,7 +74,6 @@ class GoogleSearch(scrapy.Spider):
     # Generates and yields LinkItem to LinkPipeline
     def follow_link(self, response, url, text, fragment, nofollow):
         link = LinkItem()
-        print("followed: "+url)
         link['url'] = url
         link['text'] = text
         link['fragment'] = fragment

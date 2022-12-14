@@ -31,7 +31,6 @@ if len(messengers) > 0 or (lh.has_template and len(template_messengers) > 0):
                 for record in unchecked_records:
                     # Check if lighthouse is using a template
                     if lh.has_template:
-                        print('here')
                         messenger(record['values'], lh.template.payload, lh.logger)
                     else:
                         messenger(record['values'], lh.logger)
