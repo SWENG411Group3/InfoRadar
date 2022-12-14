@@ -46,6 +46,8 @@ namespace InformationRadarCore
             settings.Bind(configService);
             builder.Services.AddSingleton(configService);
 
+            builder.Services.AddSingleton<IScrapyInterface, ScrapyInterface>();
+
             var validIssuer = settings.GetValue<string>("ReactValidIssuer");  
             builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
                 options =>
@@ -103,6 +105,12 @@ namespace InformationRadarCore
 
             app.MapFallbackToFile("index.html");
 
+
+            if (app.Services.GetRequiredService<IScrapyInterface>().CreateEnv() != 0)
+            {
+                throw new Exception("Could not set up scrapy env");
+            }
+
             Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Old", "Scripts"));
             Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Scraper", "scripts", "templates"));
             Directory.CreateDirectory(Path.Combine(configService.ResourceRoot, "Scraper", "logs"));
@@ -112,13 +120,5 @@ namespace InformationRadarCore
             app.Run();
         }
 
-        public static void roleSetup(RoleManager<IdentityRole> manager)
-        {
-            // Populate DB with default roles
-            if (!manager.RoleExistsAsync("Admin").Result)
-            {
-                manager.CreateAsync(new IdentityRole("Admin")).Wait();
-            }
-        }
     }
 }

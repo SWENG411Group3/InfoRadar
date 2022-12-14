@@ -9,6 +9,7 @@ namespace InformationRadarCore.Services
         public string ResourceRoot { get; set; }
         public string ImageDir { get; set; }
         public string ReportDir { get; set; }
+        public string AnacondaPath { get; set; }
         public string? SeedAdmin { get; set; }
 
         public string CustomScriptPath(Lighthouse lighthouse)

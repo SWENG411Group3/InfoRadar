@@ -1,0 +1,5 @@
+name: inforadar
+dependencies:
+  - pyodbc
+  - python-dotenv
+  - scrapy
