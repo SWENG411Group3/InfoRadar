@@ -102,10 +102,10 @@ class Lighthouse:
             # Extract the id and created timestamp
             id = entry[0]
             created = entry[1]
-            field_value_pairs = []
+            field_value_pairs = {}
             field_values = entry[2:]
             for i in range(len(field_values)):
-                field_value_pairs.append( (self.fields[i],field_values[i]) )
+                field_value_pairs[self.fields[i].strip("Field_")] = field_values[i]
             unchecked_records.append({'id':id, 'created':created,'values':field_value_pairs})
         return unchecked_records
     
@@ -138,6 +138,13 @@ class Lighthouse:
         else:
             self.logger.error(f"Unable to load template configuration for lighthouse: {self.internal_name}, id: {self.id}")
             self.set_error_state(True)
+    
+    def get_email_list(self):
+        query = """SELECT AspNetUsers.NormalizedEmail FROM ApplicationUserLighthouse
+                   JOIN AspNetUsers ON RecipientsId = AspNetUsers.Id
+                   WHERE ApplicationUserLighthouse.LighthousesId = ?;"""
+        email_list = self._execute_query(query, [self.id],fetch=True)
+        return [email[0] for email in email_list]
     
     def _get_search_results(self):
         query = "SELECT Url FROM SearchResults WHERE LighthouseId = ?"

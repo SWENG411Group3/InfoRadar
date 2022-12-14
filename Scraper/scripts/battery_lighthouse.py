@@ -11,6 +11,7 @@ def gather_data(response, logger):
     item = LighthouseItem()
     item['value'] = random.uniform(1,10)
     item['description'] = "Simulated price"
+    item['field'] = 'Value1'
     return item
     # loop through each available table
     # for tbl in range(1, number_of_tables(response)+1):
@@ -27,16 +28,26 @@ def gather_data(response, logger):
     #             else:
     #                 logger.info(f"Unable to scrape item for row {row}, column {col}.")
 
+
+
 @script_tools.pipeline
 def process_data(item, logger):
     adapter = ItemAdapter(item)
-    if (adapter.get('value')):
+    if (adapter.get('value')) > 3:
         logger.info("Scraped value for {}: {}".format(adapter.get('description'), adapter.get('value')))
         # update database            
-    return item
+        return 
+    else:
+        logger.info(f"Dropping value: {adapter.get('value')} because it's below my made-up threshold")
+
 
 @script_tools.messenger
 def send_data(values, logger):
-    for val in values:
-        logger.info(f'processing record:\tname: {val[0]}\tvalue: {val[1]}')
-    #raise Exception("AHHHHH!!")
+    messages = []
+    val1 = values.get('Value1')
+    val2 = values.get('Value2')
+    if val1 > 500:
+        messages.append(f"Sample notification from an actual messenger:\nValue1 exceeded the imaginary threshold of 500. Actual value: {val1}")
+    if val2 < 250:
+        messages.append(f"Another notification from an actual messenger:\nValue2 is less than the imaginary threshold of 250. Actual value: {val2}")
+    return "\n".join(messages) if len(messages) > 0 else None

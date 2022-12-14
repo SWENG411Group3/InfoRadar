@@ -12,14 +12,26 @@ from scraper.items import *
 
 
 class LighthouseItemPipeline:
+    saved_items = []
     def process_item(self, item, spider):
         if isinstance(item, LighthouseItem):
             if spider.lighthouse.has_template:
                 for pipeline in spider.lighthouse.get_template_pipelines():
-                    pipeline(item, spider.lighthouse.logger)
+                    self.saved_items.append(pipeline(item, spider.lighthouse.logger))
             else:
                 for pipeline in spider.lighthouse.get_script_pipelines():
-                    pipeline(item, spider.lighthouse.logger)
+                    self.saved_items.append(pipeline(item, spider.lighthouse.logger))
+    
+    def open_spider(self, spider):
+        if spider.name == "Lighthouse Spider":
+            self.saved_items.clear()
+            
+    def close_spider(self, spider):
+        if spider.name == "Lighthouse Spider":
+            data = list(filter(lambda item: item is not None, self.saved_items))
+            #spider.lighthouse.update_lighthouse(self.saved_items)
+            for item in data:
+                print(item)
 
 class LinkPipeline:
     MAX_LATENCY = 1.5

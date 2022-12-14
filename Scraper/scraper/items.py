@@ -7,6 +7,7 @@ import scrapy
 
 # A generic lighthouse item consisting of a description and a value
 class LighthouseItem(scrapy.Item):
+    field = scrapy.Field()
     value = scrapy.Field()
     description = scrapy.Field()
     
