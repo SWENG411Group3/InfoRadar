@@ -14,11 +14,15 @@ from scraper.items import *
 class LighthouseItemPipeline:
     def process_item(self, item, spider):
         if isinstance(item, LighthouseItem):
-            for pipeline in spider.lighthouse.get_pipelines():
-                pipeline(item, spider.logger)
+            if spider.lighthouse.has_template:
+                for pipeline in spider.lighthouse.get_template_pipelines():
+                    pipeline(item, spider.lighthouse.logger)
+            else:
+                for pipeline in spider.lighthouse.get_script_pipelines():
+                    pipeline(item, spider.lighthouse.logger)
 
 class LinkPipeline:
-    MAX_LATENCY = 1.0
+    MAX_LATENCY = 1.5
     saved_links = []
     def process_item(self, item, spider):
         if isinstance(item, LinkItem):
@@ -42,26 +46,24 @@ class LinkPipeline:
                 spider.lighthouse.update_search_results(link)
 
 
-class PricePipeline:
-    def process_item(self, item, spider):
-        if isinstance(item, PriceItem):
-            adapter = ItemAdapter(item)
-            if (adapter.get('price')):
-                logging.info("Scraped price for {}: {}".format(adapter.get('description'), adapter.get('price')))
-                # Here we can reach out to the controller and check any thresholds
-                # for now just return            
-        return item
+# class PricePipeline:
+#     def process_item(self, item, spider):
+#         if isinstance(item, PriceItem):
+#             adapter = ItemAdapter(item)
+#             if (adapter.get('price')):
+#                 logging.info("Scraped price for {}: {}".format(adapter.get('description'), adapter.get('price')))         
+#         return item
     
-class JsonWriterPipeline:
-    def open_spider(self, spider):
-        self.file = open('items.jsonl', 'w')
+# class JsonWriterPipeline:
+#     def open_spider(self, spider):
+#         self.file = open('items.jsonl', 'w')
 
-    def close_spider(self, spider):
-        self.file.close()
+#     def close_spider(self, spider):
+#         self.file.close()
 
-    def process_item(self, item, spider):
-        if item is not None:
-            line = json.dumps(ItemAdapter(item).asdict()) + "\n"
-            self.file.write(line)
-            return item
+#     def process_item(self, item, spider):
+#         if item is not None:
+#             line = json.dumps(ItemAdapter(item).asdict()) + "\n"
+#             self.file.write(line)
+#             return item
     

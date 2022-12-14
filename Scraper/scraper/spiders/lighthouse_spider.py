@@ -2,6 +2,7 @@ import scrapy
 from scrapy import signals
 from controller import logger
 from controller import orm
+from datetime import datetime
 import logging
 
 class LighthouseSpider(scrapy.Spider):
@@ -28,31 +29,39 @@ class LighthouseSpider(scrapy.Spider):
         self.logger.info("Retrieving lighthouse")
         self.lighthouse = db.get_lighthouse(self.lighthouse_id)
         self.logger.info(f"Running {self.lighthouse.internal_name}_lighthouse")
-        self.lighthouse.notify_running(True)
+        # Update the url list for scrapy
         self.start_urls = self.lighthouse.get_urls()
-        # notify database that spider is running
+        # Notify that spider is running
+        self.lighthouse.notify_running(True)
         
     # Method called whenever a spider is closed
     def spider_closed(self, spider):
         self.logger.info("Spider closed")
         # Update the lighthouse logs
         logger.update_log(self.lighthouse)
-        # notify database that spider is not running
+        # Notify that spider is not running
         self.lighthouse.notify_running(False)
+        # Update the last visitor run time
+        self.lighthouse.set_last_run(datetime.utcnow())
         
     # Method called when an error occurs within a spider
     def spider_error(self, failure, response, spider):
         # Handle errors here
         self.logger.error(failure)
         self.lighthouse.set_error_state(True)
+        self.lighthouse.notify_running(False)
     
     # Method that parses the request for a given url
     def parse(self, response):
-        visitors = self.lighthouse.get_visitors()
         data = []
-        for visitor in visitors:
-            data.append(visitor(response, self.logger))
-        # Make sure we have one full list of data
+        # Check for a template
+        if self.lighthouse.has_template:
+            for visitor in self.lighthouse.get_template_visitors():
+                data.append(visitor(response, self.lighthouse.template.payload, self.logger))
+        # No template found, run user script
+        else:
+            for visitor in self.lighthouse.get_script_visitors():
+                data.append(visitor(response, self.logger))
         for item in data:
             yield(item)
     

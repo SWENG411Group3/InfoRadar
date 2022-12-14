@@ -2,7 +2,6 @@ import scrapy
 from scrapy import signals
 from scrapy.linkextractors import LinkExtractor
 from distutils.log import info
-from controller import test
 from scraper.items import LinkItem
 import controller.logger as logger
 from urllib.parse import urlparse
@@ -30,8 +29,7 @@ class GoogleSearch(scrapy.Spider):
     # Method called whenever a spider is opened
     def spider_opened(self, spider):
         self.logger.info("Spider was opened")
-        # Retrieve the lighthouse configuration from the controller
-        self.config = test.fetch_lighthouse_info(self.lighthouse_id)
+        # Retrieve the lighthouse
         db = orm.from_env()
         self.lighthouse = db.get_lighthouse(self.lighthouse_id)
         self.logger.info(f"Running {self.lighthouse.internal_name}_lighthouse")
