@@ -6,6 +6,9 @@ namespace InformationRadarCore.Models
     {
         public int Id { get; set; }
 
+        [Required, Range(5, 50)]
+        public int NumResults { get; set; } = 10;
+
         [Required]
         public Lighthouse Lighthouse { get; set; }
         public int LighthouseId { get; set; }

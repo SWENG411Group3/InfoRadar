@@ -57,7 +57,7 @@ namespace InformationRadarCore.Controllers
             var users = await db.Users
                 .OrderByDescending(e => e.Id)
                 .Where(e =>
-                    (string.IsNullOrEmpty(query.Cursor) || string.Compare(e.Id, query.Cursor) < 0) && e.EmailConfirmed
+                    (string.IsNullOrEmpty(query.Cursor) || string.Compare(e.Id, query.Cursor) < 0)
                 )
                 .Select(e => new
                 {
@@ -75,7 +75,7 @@ namespace InformationRadarCore.Controllers
             {
                 Entries = users,
                 IsComplete = !string.IsNullOrEmpty(cursor) && !await db.Users
-                    .AnyAsync(e => string.Compare(e.Id, cursor) < 0 && e.EmailConfirmed),
+                    .AnyAsync(e => string.Compare(e.Id, cursor) < 0),
                 Cursor = cursor,
             });
         }
