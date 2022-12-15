@@ -1,4 +1,3 @@
-using IdentityModel;
 using InformationRadarCore.Data;
 using InformationRadarCore.Models;
 using InformationRadarCore.Services;
@@ -6,10 +5,7 @@ using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 namespace InformationRadarCore
@@ -47,6 +43,12 @@ namespace InformationRadarCore
             builder.Services.AddSingleton(configService);
 
             builder.Services.AddSingleton<IScrapyInterface, ScrapyInterface>();
+            builder.Services.AddSingleton<IRunQueue, RunQueue>();
+
+            if (!configService.DebugWithoutCycle)
+            {
+                builder.Services.AddHostedService<LighthouseTimer>();
+            }
 
             var validIssuer = settings.GetValue<string>("ReactValidIssuer");  
             builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
