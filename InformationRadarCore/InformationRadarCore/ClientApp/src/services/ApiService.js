@@ -45,18 +45,50 @@ class ApiService {
     }
 
     getLighthouses(options = {}) {
-        return this.basicPaginatorRequest("api/Lighthouse", options);
+        return this.basicPaginatorRequest("/api/Lighthouse", options);
     }
 
     async getLighthouse(id) {
-        return await fetch("api/Lighthouse/" + id, { 
+        return await fetch("/api/Lighthouse/" + id, { 
             headers: await this.bearer() 
         }).then(e => e.json());
     }
 
-    updateLighthouse(options) {
-        //return bearer().then(headers => fetch())
+    async postData(apiEndpoint, data) {
+        const token = await authService.getAccessToken();
+        const response = await fetch(apiEndpoint, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+
+        const body = await response.json();
+        if (response.status === 200) {
+            return body;
+        }
+
+        return Promise.reject(normalizeErrors(body));
     }
+
+    uploadTemplate(template) {
+        return this.postData("/api/Template", template);
+    }
+}
+
+// Adds message attribute to JSON deserialization errors
+function normalizeErrors(body) {
+    if (typeof body.errors === "object") {
+        body.message = Object.values(body.errors)
+            .map(e => e.join(", "))
+            .join("; ");
+    } else if (typeof body.errors === "string") {
+        body.message = body.errors;
+    }
+    return body.message;
 }
 
 const apiService = new ApiService();

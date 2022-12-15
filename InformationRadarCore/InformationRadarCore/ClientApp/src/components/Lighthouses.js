@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import authService from "./api-authorization/AuthorizeService";
 import apiService from "../services/ApiService";
+import { DashboardAdminButtons } from "./DashboardAdminButtons";
 
 export class Lighthouses extends Component {
     static displayName = Lighthouses.name;
@@ -13,7 +13,6 @@ export class Lighthouses extends Component {
             cursor: null,
             isAdmin: false,
         };
-        this.templates = {};
     }
 
     componentDidMount() {
@@ -32,75 +31,15 @@ export class Lighthouses extends Component {
         });
     }
 
-    async loadTemplates() {}
+    async loadTemplates() {
 
-    static readJsonFile(e) {
-        return new Promise((resolve, reject) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.addEventListener("load", e => {
-                try {
-                    resolve(JSON.parse(reader.result.toString()));
-                } catch (e) {
-                    reject(e);
-                }
-            });
-            reader.addEventListener("abort", reject);
-            reader.addEventListener("error", reject);
-            reader.readAsText(file);
-        });
     }
-
-    async uploadTemplate(e) {
-        let template = {};
-        try {
-            template = await Lighthouses.readJsonFile(e);
-        } catch (e) {
-            alert("Could not parse template");
-            console.error(e);
-            return;
-        }
-
-        
-    }
-
-    async newLighthouse(e) {}
-
-    async templLighthouse(e) {}
 
     render() {
         return (
             <div>
                 {this.state.isAdmin && 
-                    <div>
-                        <div id="admin-upload">
-                            <label htmlFor="upload-template">
-                                <div className="btn btn-primary">Upload Template</div>
-                            </label>
-
-                            <label htmlFor="upload-custom-lighthouse">
-                                <div className="btn btn-primary">New Custom Lighthouse</div>
-                            </label>
-                            
-                            <label htmlFor="upload-template-lighthouse">
-                                <div className="btn btn-primary">New Templated Lighthouse</div>
-                            </label>
-                        </div>
-                        <div className="invisible">
-                            <input id="upload-template" 
-                                className="invisible"
-                                type="file" name="template-file" 
-                                accept=".json" onChange={this.uploadTemplate} />
-                            <input id="upload-custom-lighthouse" 
-                                className="invisible"
-                                type="file" name="new-lighthouse-file" 
-                                accept=".json" onChange={this.newLighthouse} />
-                            <input id="upload-template-lighthouse" 
-                                className="invisible"
-                                type="file" name="new-lighthouse-template-file" 
-                                accept=".json" onChange={this.templLighthouse} />
-                        </div>
-                    </div>}
+                    <DashboardAdminButtons />}
 
                 <table className='table table-striped' aria-labelledby="tabelLabel">
                     <thead>
