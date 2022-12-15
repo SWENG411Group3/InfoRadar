@@ -1,5 +1,6 @@
 InformationRadarCore/.vs
 .env
 __pycache__
+Scraper/Old
+Scraper/scripts
 pyenv
-InfoRadar.code-workspace

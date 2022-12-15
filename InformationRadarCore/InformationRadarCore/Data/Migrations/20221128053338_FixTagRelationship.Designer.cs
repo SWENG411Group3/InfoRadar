@@ -4,6 +4,7 @@ using InformationRadarCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InformationRadarCore.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221128053338_FixTagRelationship")]
+    partial class FixTagRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,9 +199,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -246,35 +245,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("InformationRadarCore.Models.GeneratedReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("LighthouseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReportType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LighthouseId");
-
-                    b.ToTable("Reports");
-                });
-
             modelBuilder.Entity("InformationRadarCore.Models.GoogleQuery", b =>
                 {
                     b.Property<int>("Id")
@@ -284,9 +254,6 @@ namespace InformationRadarCore.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("LighthouseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumResults")
                         .HasColumnType("int");
 
                     b.Property<string>("Query")
@@ -310,10 +277,6 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("bit");
@@ -364,29 +327,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.ToTable("Lighthouses");
                 });
 
-            modelBuilder.Entity("InformationRadarCore.Models.SearchResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("LighthouseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LighthouseId");
-
-                    b.ToTable("SearchResults");
-                });
-
             modelBuilder.Entity("InformationRadarCore.Models.Site", b =>
                 {
                     b.Property<int>("Id")
@@ -403,8 +343,7 @@ namespace InformationRadarCore.Data.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -442,20 +381,10 @@ namespace InformationRadarCore.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(700)
-                        .HasColumnType("nvarchar(700)");
-
                     b.Property<string>("InternalName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
 
                     b.HasKey("Id");
 
@@ -491,29 +420,6 @@ namespace InformationRadarCore.Data.Migrations
                     b.HasIndex("TemplateId");
 
                     b.ToTable("TemplateConfigurations");
-                });
-
-            modelBuilder.Entity("InformationRadarCore.Models.TemplateDefaultSite", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TemplateId");
-
-                    b.ToTable("TemplateDefaultSites");
                 });
 
             modelBuilder.Entity("InformationRadarCore.Models.TemplateField", b =>
@@ -746,32 +652,10 @@ namespace InformationRadarCore.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InformationRadarCore.Models.GeneratedReport", b =>
-                {
-                    b.HasOne("InformationRadarCore.Models.Lighthouse", "Lighthouse")
-                        .WithMany("Reports")
-                        .HasForeignKey("LighthouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lighthouse");
-                });
-
             modelBuilder.Entity("InformationRadarCore.Models.GoogleQuery", b =>
                 {
                     b.HasOne("InformationRadarCore.Models.Lighthouse", "Lighthouse")
                         .WithMany("GoogleQueries")
-                        .HasForeignKey("LighthouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lighthouse");
-                });
-
-            modelBuilder.Entity("InformationRadarCore.Models.SearchResult", b =>
-                {
-                    b.HasOne("InformationRadarCore.Models.Lighthouse", "Lighthouse")
-                        .WithMany()
                         .HasForeignKey("LighthouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -805,17 +689,6 @@ namespace InformationRadarCore.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Lighthouse");
-
-                    b.Navigation("Template");
-                });
-
-            modelBuilder.Entity("InformationRadarCore.Models.TemplateDefaultSite", b =>
-                {
-                    b.HasOne("InformationRadarCore.Models.Template", "Template")
-                        .WithMany()
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Template");
                 });
@@ -911,8 +784,6 @@ namespace InformationRadarCore.Data.Migrations
             modelBuilder.Entity("InformationRadarCore.Models.Lighthouse", b =>
                 {
                     b.Navigation("GoogleQueries");
-
-                    b.Navigation("Reports");
 
                     b.Navigation("Sites");
 

@@ -1,16 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InformationRadarCore.Models
 {
-
-    public enum LighthouseSize { 
-        Small,
-        Medium,
-        Large,
-        ExtraLarge,
-    }
-
     [Index(nameof(InternalName), IsUnique = true)]
     public class Lighthouse
     {
@@ -22,22 +15,25 @@ namespace InformationRadarCore.Models
         /// The associated python script will be named [INTERNAL NAME]_lighthouse.py
         /// </summary>
         [Required, MinLength(1), MaxLength(100)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z]*$")]
+        [RegularExpression(@"^[a-zA-Z]\w*$")]
         public string InternalName { get; set; }
 
         /// <summary>
         /// The human-readable title of the lighthouse
         /// </summary>
-        [Required, MaxLength(100)]
+        [Required, MaxLength(300)]
         public string Title { get; set; }
 
-        public DateTime? LastVisitorRun { get; set; }
+        /// <summary>
+        /// Lighthouse description
+        /// </summary>
+        [MaxLength(1000)]
+        public string? Description { get; set; }
 
         /// <summary>
-        /// The estimated size of the lighthouse
+        /// Last time the scraper ran
         /// </summary>
-        [Required]
-        public LighthouseSize BaseSize { get; set; }
+        public DateTime? LastVisitorRun { get; set; }
 
         /// <summary>
         /// How often the lighthouse gathers data (measured in seconds)
@@ -45,7 +41,7 @@ namespace InformationRadarCore.Models
         /// based on the lighthouse's base size
         /// </summary>
         [Required]
-        public ulong? Frequency { get; set; }
+        public ulong Frequency { get; set; }
 
         /// <summary>
         /// How often the lighthouse checks if a message should be sent to recipients
@@ -68,18 +64,37 @@ namespace InformationRadarCore.Models
         public DateTime? LastSentMessage { get; set; }
 
         /// <summary>
+        /// Index of the latest log file
+        /// </summary>
+        public int LatestLog { get; set; } = 0;
+
+        /// <summary>
         /// Whether or not the lighthouse should run
         /// </summary>
         [Required]
         public bool Enabled { get; set; }
 
         /// <summary>
+        /// Bool set if an irrecoverable error has been thrown on lighthouse
+        /// </summary>
+        [Required]
+        public bool HasError { get; set; } = false;
+
+        [MaxLength(16)]
+        public string? Thumbnail { get; set; }
+
+        [Required]
+        public bool Running { get; set; } = false;
+
+        /// <summary>
         /// App users who will recieve a message
         /// </summary>
         public ICollection<ApplicationUser> Recipients { get; set; }
-
         public ICollection<GoogleQuery> GoogleQueries { get; set; }
-
         public ICollection<Site> Sites { get; set; }
+        public ICollection<Tag> Tags { get; set; } 
+        public ICollection<GeneratedReport> Reports { get; set; }
+
+        public TemplateConfiguration? TemplateConfig { get; set; }
     }
 }
