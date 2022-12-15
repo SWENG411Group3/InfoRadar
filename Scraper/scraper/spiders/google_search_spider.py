@@ -14,7 +14,8 @@ class GoogleSearch(scrapy.Spider):
     url_query = "https://www.google.com/url?q="
     excludes = ['https://accounts.google.', 
                 'https://support.google.',
-                'www.youtube.com']
+                'www.youtube.com',
+                'https://maps.google.com']
 
     config = {}
 
@@ -58,8 +59,7 @@ class GoogleSearch(scrapy.Spider):
         filtered_links = []
         #for link in potential_links:
         #    filtered_links.append(urlparse(urlparse(link.url).query.strip("q=")).hostname)
-            
-        list_of_links = links[:10] if len(potential_links) > 10 else potential_links
+        list_of_links = potential_links[:10] if len(potential_links) > 10 else potential_links
         self.logger.info(f"Scraped {len(list_of_links)} links from {response.url}")
         for link in list_of_links:
             if not link.nofollow:
