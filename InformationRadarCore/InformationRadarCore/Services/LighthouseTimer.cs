@@ -38,7 +38,10 @@ namespace InformationRadarCore.Services
         private async Task GatherVisitors(ApplicationDbContext db, DateTime now, CancellationToken stoppingToken)
         {
             var overdue = await db.Lighthouses
-                .Where(l => l.LastVisitorRun == null || EF.Functions.DateDiffSecond(l.LastVisitorRun.Value, now) > (int)l.Frequency)
+                .Where(l => 
+                    l.Enabled && !l.HasError && 
+                    (l.LastVisitorRun == null || EF.Functions.DateDiffSecond(l.LastVisitorRun.Value, now) > (int)l.Frequency)
+                )
                 .Select(lighthouse => new
                 {
                     lighthouse.Id,
@@ -55,7 +58,10 @@ namespace InformationRadarCore.Services
         private async Task GatherMessengers(ApplicationDbContext db, DateTime now, CancellationToken stoppingToken)
         {
             var overdue = await db.Lighthouses
-                .Where(l => l.LastSentMessage == null || EF.Functions.DateDiffSecond(l.LastSentMessage.Value, now) > (int)(l.MessengerFrequency ?? l.Frequency))
+                .Where(l =>
+                    l.Enabled && !l.HasError &&
+                    l.LastSentMessage == null || EF.Functions.DateDiffSecond(l.LastSentMessage.Value, now) > (int)(l.MessengerFrequency ?? l.Frequency)
+                )
                 .Select(l => l.Id)
                 .ToListAsync(stoppingToken);
 
