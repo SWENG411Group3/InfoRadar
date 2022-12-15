@@ -2,11 +2,23 @@ import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizati
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
 import { Home } from "./components/Home";
+import { LighthousePage } from "./components/LighthousePage";
+import { Lighthouses } from './components/Lighthouses';
 
 const AppRoutes = [
   {
     index: true,
     element: <Home />
+  },
+  {
+    path: '/dashboard',
+    requireAuth: true,
+    element: <Lighthouses />
+  },
+  {
+    path: '/Lighthouse/:id',
+    requireAuth: true,
+    element: <LighthousePage />
   },
   {
     path: '/counter',

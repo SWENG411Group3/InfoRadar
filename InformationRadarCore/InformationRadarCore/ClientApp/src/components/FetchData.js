@@ -55,6 +55,10 @@ export class FetchData extends Component {
   async populateWeatherData() {
       const token = await authService.getAccessToken();
 
+      const endpoint = new URL("/api/Lighthouse");
+      endpoint.searchParams.set("cursor", "");
+      endpoint.searchParams.set("", "");
+
       fetch('/api/Lighthouse', {
           headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
       }).then(e=> e.json()).then(console.log);
