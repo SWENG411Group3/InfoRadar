@@ -55,25 +55,13 @@ export class Lighthouses extends Component {
                             <tr key={lighthouse.internalName}>
                                 <td><a href={"/Lighthouse/" + lighthouse.id}>{lighthouse.title}</a></td>
                                 <td>
-                                    <input type="checkbox" 
-                                        name={lighthouse.internalName + "-enabled-checkbox"}
-                                        lighthouse={lighthouse.id} 
-                                        readOnly
-                                        checked={lighthouse.enabled} />
+                                    {lighthouse.enabled ? <span className="text-success">True</span> : <span className="text-muted">False</span>}
                                 </td>
                                 <td>
-                                    <input type="checkbox" 
-                                        name={lighthouse.internalName + "-error-checkbox"}
-                                        value={lighthouse.id} 
-                                        readOnly
-                                        checked={lighthouse.hasError} />
+                                    {lighthouse.hasError ? <span className="text-danger">True</span> : <span className="text-success">False</span>}
                                 </td>
                                 <td>
-                                    <input type="checkbox" 
-                                        name={lighthouse.internalName + "-subscribed-checkbox"}
-                                        value={lighthouse.id} 
-                                        readOnly
-                                        checked={lighthouse.subscribed} />
+                                    {lighthouse.subscribed ? <span className="text-success">True</span> : <span className="text-muted">False</span>}
                                 </td>
                             </tr>
                         )}

@@ -97,6 +97,14 @@ class ApiService {
     uploadTemplate(template) {
         return this.postData("/api/Template", template);
     }
+
+    uploadCustomLighthouse(lighthouse) {
+        return this.postData("/api/Lighthouse/NewCustom", lighthouse);
+    }
+
+    uploadTemplateLighthouse(lighthouse) {
+        return this.postData("/api/Lighthouse/New", lighthouse);
+    }
 }
 
 // Adds message attribute to JSON deserialization errors
