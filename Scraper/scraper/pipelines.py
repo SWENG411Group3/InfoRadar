@@ -10,7 +10,6 @@ from scrapy.exceptions import DropItem
 import logging
 from scraper.items import *
 
-
 class LighthouseItemPipeline:
     saved_items = []
     def process_item(self, item, spider):
@@ -28,11 +27,17 @@ class LighthouseItemPipeline:
             
     def close_spider(self, spider):
         if spider.name == "Lighthouse Spider":
-            data = list(filter(lambda item: item is not None, self.saved_items))
-            #spider.lighthouse.update_lighthouse(self.saved_items)
-            for item in data:
-                print(item)
-
+            filtered_items = list(filter(lambda item: item is not None, self.saved_items))
+            for item in filtered_items:
+                adapter = ItemAdapter(item)
+                value = adapter.get('value')
+                if isinstance(value, list):
+                    for row in value:
+                        spider.lighthouse.insert_row(row)
+                else:
+                    #TODO: extend functionality to handle various types of user-created items 
+                    pass
+                
 class LinkPipeline:
     MAX_LATENCY = 1.5
     saved_links = []
@@ -53,29 +58,9 @@ class LinkPipeline:
 
     def close_spider(self, spider):
         if spider.name == "Google Spider":
-            spider.logger.info(f"{len(self.saved_links)} links passed latency requirement")
+            if len(self.saved_links) > 0:
+                spider.logger.info(f"{len(self.saved_links)} links passed latency requirement")
+            else:
+                spider.logger.info("Either no links passed the latency requirement or there were no Google queries specified for this lighthouse")
             for link in self.saved_links:
                 spider.lighthouse.update_search_results(link)
-
-
-# class PricePipeline:
-#     def process_item(self, item, spider):
-#         if isinstance(item, PriceItem):
-#             adapter = ItemAdapter(item)
-#             if (adapter.get('price')):
-#                 logging.info("Scraped price for {}: {}".format(adapter.get('description'), adapter.get('price')))         
-#         return item
-    
-# class JsonWriterPipeline:
-#     def open_spider(self, spider):
-#         self.file = open('items.jsonl', 'w')
-
-#     def close_spider(self, spider):
-#         self.file.close()
-
-#     def process_item(self, item, spider):
-#         if item is not None:
-#             line = json.dumps(ItemAdapter(item).asdict()) + "\n"
-#             self.file.write(line)
-#             return item
-    

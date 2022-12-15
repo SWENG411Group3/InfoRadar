@@ -24,7 +24,11 @@ template_messengers = lh.get_template_messengers()
 messages = []
 if len(messengers) > 0 or (lh.has_template and len(template_messengers) > 0):
     # Check if any new records have been written since last messenger run
-    unchecked_records = lh.get_unchecked_records(lh.get_last_sent_message())
+    last_check = lh.get_last_sent_message()
+    if last_check is None:
+        unchecked_records = lh.get_unchecked_records(check_all=True)
+    else:
+        unchecked_records = lh.get_unchecked_records(timestamp=last_check)
     if len(unchecked_records) > 0:
         lh.logger.info(f"Found {len(unchecked_records)} new records since the last messenger run")
         lh.logger.info("Running messengers")
@@ -50,7 +54,7 @@ else:
 
 # email if any messages were populated
 if len(messages) > 0:
-    # Get the email list and send
+    # Check for any email recipients
     email_list = lh.get_email_list()
     if len(email_list) > 0:
         lh.logger.info(f"Sending notification email(s) to {', '.join(email_list)}")
@@ -58,6 +62,7 @@ if len(messages) > 0:
         send_email(lh.internal_name, email_list, body)
     else:
         lh.logger.info(f"Messenger(s) have {len(messages)} notifications, but no email addresses are configured")
+        lh.logger.info("Notification(s): " + "\n".join(messages))
 else:
     if len(unchecked_records) > 0:
         # Messengers ran but didn't find anything

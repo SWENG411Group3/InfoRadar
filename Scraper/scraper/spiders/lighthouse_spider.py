@@ -57,11 +57,11 @@ class LighthouseSpider(scrapy.Spider):
         # Check for a template
         if self.lighthouse.has_template:
             for visitor in self.lighthouse.get_template_visitors():
-                data.append(visitor(response, self.lighthouse.template.payload, self.logger))
+                data.append(visitor(response, self.lighthouse.template.payload, self.lighthouse.logger))
         # No template found, run user script
         else:
             for visitor in self.lighthouse.get_script_visitors():
-                data.append(visitor(response, self.logger))
+                data.append(visitor(response, self.lighthouse.logger))
         for item in data:
             yield(item)
     

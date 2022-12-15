@@ -94,9 +94,13 @@ class Lighthouse:
         last_sent = self._execute_query(query, [self.id], fetch=True)
         return last_sent[0][0] if last_sent is not None else None
         
-    def get_unchecked_records(self, timestamp):
-        query = f"SELECT * FROM {self.internal_name}_Lighthouse WHERE Created > ?"
-        entries = self._execute_query(query, [timestamp], fetch=True)
+    def get_unchecked_records(self, timestamp=None):
+        if timestamp is None:
+            query = f"SELECT * FROM {self.internal_name}_Lighthouse"
+            entries = self._execute_query(query, fetch=True)
+        else:
+            query = f"SELECT * FROM {self.internal_name}_Lighthouse WHERE Created > ?"
+            entries = self._execute_query(query, [timestamp], fetch=True)
         unchecked_records = []
         for entry in entries:
             # Extract the id and created timestamp
@@ -113,6 +117,28 @@ class Lighthouse:
         query = "UPDATE Lighthouses SET Running = ?"
         self._execute_query(query, [int(state)])
         
+    def insert_row(self, row): 
+        # Get the current time
+        utc = datetime.utcnow()
+        col_names = ["Created"]
+        values = [utc]
+        for entry in row:
+            for k,v in entry.items():
+                col_names.append("Field_" + k)
+                values.append(v)
+        n_params = ", ".join(["?"] * len(col_names))
+        fields = "Created, "+ ", ".join(self.fields)
+        query = f"INSERT INTO {self.internal_name}_Lighthouse ( {fields} ) VALUES ( {n_params} )"
+
+        with self._orm.connection() as connection:
+            with connection.cursor() as lh_writer:
+                try:
+                    lh_writer.execute(query, values)
+                    connection.commit()
+                except Exception as err:
+                    self.logger.error(err)
+                    self.set_error_state(True)
+
     def set_last_run(self,utc):
         query = """UPDATE Lighthouses
                    SET LastVisitorRun = ?
@@ -157,11 +183,14 @@ class Lighthouse:
         sites = self._execute_query(query, [self.id], fetch=True)
         return [site[0] for site in sites]
     
-    def _execute_query(self, query, params, fetch=False):
+    def _execute_query(self, query, params=None, fetch=False):
         with self._orm.connection() as connection:
             with connection.cursor() as lh_writer:
                 try:
-                    lh_writer.execute(query, params)
+                    if params:
+                        lh_writer.execute(query, params)
+                    else:
+                        lh_writer.execute(query)
                     if fetch:
                         return lh_writer.fetchall()
                 except Exception as err:

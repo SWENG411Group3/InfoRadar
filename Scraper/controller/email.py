@@ -10,7 +10,7 @@ def send_email(lh_name, email_list, contents):
     
     # Build the message
     contents += ("\n\n\nYou have received this email because you are subscribed to "
-                f"{lh_name.title()} Lighthouse and a notification threshold has been met.")
+                f"the {lh_name.title()} Lighthouse and a notification threshold has been met.")
     msg = MIMEText(contents)
     msg['From'] = email_address
     msg['To'] = ', '.join(email_list)
@@ -24,3 +24,4 @@ def send_email(lh_name, email_list, contents):
     session.login(email_address, email_password)
     session.sendmail(email_address, email_list, msg.as_string())
     session.quit()
+    
