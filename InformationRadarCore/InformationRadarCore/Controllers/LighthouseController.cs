@@ -19,14 +19,16 @@ namespace InformationRadarCore.Controllers
         private readonly ConfigService config;
         private readonly IAuthService auth;
         private readonly IDynDb dynDb;
+        private readonly IRunQueue exec;
 
-        public LighthouseController(ApplicationDbContext db, IWebHostEnvironment env, ConfigService config, IAuthService auth, IDynDb dynDb)
+        public LighthouseController(ApplicationDbContext db, IWebHostEnvironment env, ConfigService config, IAuthService auth, IDynDb dynDb, IRunQueue runQueue)
         {
             this.db = db;
             this.env = env;
             this.dynDb = dynDb;
             this.config = config;
             this.auth = auth;
+            exec = runQueue;
         }
 
         [HttpGet("Search")]
@@ -640,6 +642,80 @@ namespace InformationRadarCore.Controllers
             await db.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpPost("{id}/Run")]
+        public async Task<IActionResult> RunLighthouseVisitor(int id)
+        {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
+            var lighthouse = await db.Lighthouses
+                .Select(l => new 
+                { 
+                    l.Id,
+                    RunSearch = l.GoogleQueries.Any(),
+                })
+                .SingleOrDefaultAsync(l => l.Id == id);
+
+            if (lighthouse == null)
+            {
+                return NotFound(new
+                {
+                    Message = $"No lighthouse with id {id}"
+                });
+            }
+
+            if (exec.StartVisitor(lighthouse.Id, lighthouse.RunSearch))
+            {
+                return Ok(new
+                {
+                    Message = $"Started lighthouse {id} visitor process"
+                });
+            }
+
+            return BadRequest(new
+            { 
+                Message = $"Lighthouse {id} is already running or queued for visitation"
+            });
+        }
+
+        [HttpPost("{id}/SendMessages")]
+        public async Task<IActionResult> RunLighthouseMessenger(int id)
+        {
+            if (!await auth.IsAdmin())
+            {
+                return Unauthorized(new
+                {
+                    Message = AuthService.UNAUTHORIZED,
+                });
+            }
+
+            if (!await db.Lighthouses.AnyAsync(l => l.Id == id))
+            {
+                return NotFound(new
+                {
+                    Message = $"No lighthouse with id {id}"
+                });
+            }
+
+            if (exec.StartMessenger(id))
+            {
+                return Ok(new
+                {
+                    Message = $"Started lighthouse {id} messenger process"
+                });
+            }
+
+            return BadRequest(new
+            {
+                Message = $"Lighthouse {id} is already running or queued for messaging"
+            });
         }
     }
 }
