@@ -7,7 +7,7 @@ class ApiService {
     }
 
     async isAdmin() {
-        if (this.adminCache != null) {
+        if (this.adminCache !== null) {
             return this.adminCache;
         }
 
@@ -27,14 +27,8 @@ class ApiService {
         return { "Authorization": `Bearer ${token}` };
     }
 
-    async basicPaginatorRequest(apiRoute, options = {}) {
-        const params = new URLSearchParams();
-        if (options.pageSize !== undefined) {
-            params.set("pageSize", options.pageSize);
-        }
-        if (options.cursor !== undefined) {
-            params.set("cursor", options.cursor);
-        }
+    async basicGetRequest(apiRoute, options = {}) {
+        const params = new URLSearchParams(options);
 
         const token = await authService.getAccessToken();
         return await fetch(apiRoute + "?" + params.toString(), {
@@ -45,7 +39,19 @@ class ApiService {
     }
 
     getLighthouses(options = {}) {
-        return this.basicPaginatorRequest("/api/Lighthouse", options);
+        return this.basicGetRequest("/api/Lighthouse", options);
+    }
+
+    getReports(options = {}) {
+        return this.basicGetRequest("/api/ReportingEngine/Reports", options);
+    }
+
+    getSites(options = {}) {
+        return this.basicGetRequest("/api/SearchEngine/Sites", options);
+    }
+
+    getQueries(options = {}) {
+        return this.basicGetRequest("/api/SearchEngine/Queries", options);
     }
 
     async getLighthouse(id) {
@@ -74,6 +80,20 @@ class ApiService {
         return Promise.reject(normalizeErrors(body));
     }
 
+    generateReport(lighthouse, type = null, pageSize = null, pages = null) {
+        const payload = {};
+        if (pageSize) {
+            payload.pageSize = pageSize;
+        }
+        if (pages) {
+            payload.pages = pages;
+        }
+        if (type) {
+            payload.type = type;
+        }
+        return this.postData("api/ReportingEngine/Generate/" + lighthouse, payload);
+    }
+
     uploadTemplate(template) {
         return this.postData("/api/Template", template);
     }
@@ -81,10 +101,12 @@ class ApiService {
 
 // Adds message attribute to JSON deserialization errors
 function normalizeErrors(body) {
-    if (typeof body.errors === "object") {
+    if (body.errors && Array.isArray(body.errors)) {
+        body.message = body.errors.join("\n");
+    } else if (typeof body.errors === "object") {
         body.message = Object.values(body.errors)
-            .map(e => e.join(", "))
-            .join("; ");
+            .map(e => Array.isArray(e) ? e.join(", ") : e)
+            .join("\n");
     } else if (typeof body.errors === "string") {
         body.message = body.errors;
     }

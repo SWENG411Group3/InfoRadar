@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import apiService from "../services/ApiService";
-import { Lighthouses } from "./Lighthouses";
 
 function readJsonFile(e) {
     return new Promise((resolve, reject) => {

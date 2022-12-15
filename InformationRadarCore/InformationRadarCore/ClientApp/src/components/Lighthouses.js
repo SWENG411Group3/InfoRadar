@@ -41,7 +41,7 @@ export class Lighthouses extends Component {
                 {this.state.isAdmin && 
                     <DashboardAdminButtons />}
 
-                <table className='table table-striped' aria-labelledby="tabelLabel">
+                <table className="table table-striped" aria-labelledby="tabelLabel">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -79,7 +79,7 @@ export class Lighthouses extends Component {
                         )}
                     </tbody>
                 </table>
-                {!this.state.isComplete && <button className="btn btn-primary" onClick={this.loadLighthouses}>Load more</button>}
+                {!this.state.isComplete && <button className="btn btn-primary mr-1" onClick={this.loadLighthouses}>Load more</button>}
             </div>      
     );
   }
