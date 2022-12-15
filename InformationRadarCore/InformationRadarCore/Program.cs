@@ -47,6 +47,7 @@ namespace InformationRadarCore
             builder.Services.AddSingleton(configService);
 
             builder.Services.AddSingleton<IScrapyInterface, ScrapyInterface>();
+            builder.Services.AddSingleton<IRunQueue, RunQueue>();
 
             var validIssuer = settings.GetValue<string>("ReactValidIssuer");  
             builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,

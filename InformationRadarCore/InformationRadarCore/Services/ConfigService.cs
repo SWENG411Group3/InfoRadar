@@ -10,7 +10,7 @@ namespace InformationRadarCore.Services
         public string ImageDir { get; set; }
         public string ReportDir { get; set; }
         public string AnacondaPath { get; set; }
-        public string? SeedAdmin { get; set; }
+        public int? MaxLighthouseWorkers { get; set; }
 
         public string CustomScriptPath(Lighthouse lighthouse)
         {
