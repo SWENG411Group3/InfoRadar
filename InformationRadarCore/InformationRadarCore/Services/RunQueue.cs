@@ -112,9 +112,18 @@ namespace InformationRadarCore.Services
 
         private async Task VisitorWrapper(int lighthouse, bool boolVal)
         {
+            logger.LogInformation("Attempting to run {0} visitor", lighthouse);
             try
             {
-                await scrapy.Visitor(lighthouse, boolVal);
+                int result = await scrapy.Visitor(lighthouse, boolVal);
+                if (result == 0)
+                {
+                    logger.LogInformation("Finished running {0} visitor at [{1}]", lighthouse, DateTime.Now);
+                }
+                else
+                {
+                    logger.LogError("Messenger process for {0} visitor at [{1}]", lighthouse, DateTime.Now);
+                }
             }
             catch (Exception e)
             {
@@ -124,9 +133,18 @@ namespace InformationRadarCore.Services
 
         private async Task MessengerWrapper(int lighthouse, bool _)
         {
+            logger.LogInformation("Attempting to run {0} messenger", lighthouse);
             try
             {
-                await scrapy.Messenger(lighthouse);
+                int result = await scrapy.Messenger(lighthouse);
+                if (result == 0)
+                {
+                    logger.LogInformation("Finished running {0} messenger at [{1}]", lighthouse, DateTime.Now);
+                }
+                else 
+                {
+                    logger.LogError("Messenger process for {0} failed at [{1}]", lighthouse, DateTime.Now);
+                }
             }
             catch (Exception e)
             {
