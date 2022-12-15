@@ -12,6 +12,7 @@ namespace InformationRadarCore.Services
         public string AnacondaPath { get; set; }
         public int? TimerMsDelay { get; set; }
         public int? MaxLighthouseWorkers { get; set; }
+        public bool DebugWithoutCycle { get; set; }
 
         public string CustomScriptPath(Lighthouse lighthouse)
         {

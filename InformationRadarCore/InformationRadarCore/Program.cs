@@ -44,7 +44,11 @@ namespace InformationRadarCore
 
             builder.Services.AddSingleton<IScrapyInterface, ScrapyInterface>();
             builder.Services.AddSingleton<IRunQueue, RunQueue>();
-            builder.Services.AddHostedService<LighthouseTimer>();
+
+            if (!configService.DebugWithoutCycle)
+            {
+                builder.Services.AddHostedService<LighthouseTimer>();
+            }
 
             var validIssuer = settings.GetValue<string>("ReactValidIssuer");  
             builder.Services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
