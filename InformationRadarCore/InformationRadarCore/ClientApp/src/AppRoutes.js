@@ -2,6 +2,8 @@ import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizati
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
 import { Home } from "./components/Home";
+import { LighthousePage } from "./components/LighthousePage";
+import { Dashboard } from './components/Dashboard';
 
 const AppRoutes = [
   {
@@ -9,13 +11,14 @@ const AppRoutes = [
     element: <Home />
   },
   {
-    path: '/counter',
-    element: <Counter />
+    path: '/dashboard',
+      requireAuth: true,
+      element: <Dashboard />
   },
   {
-    path: '/fetch-data',
+    path: '/Lighthouse/:id',
     requireAuth: true,
-    element: <FetchData />
+    element: <LighthousePage />
   },
   ...ApiAuthorzationRoutes
 ];

@@ -1,5 +1,6 @@
 import { UserManager, WebStorageStateStore } from 'oidc-client';
 import { ApplicationPaths, ApplicationName } from './ApiAuthorizationConstants';
+import apiService from '../../services/ApiService';
 
 export class AuthorizeService {
   _callbacks = [];
@@ -104,6 +105,7 @@ export class AuthorizeService {
 
       await this.userManager.signoutPopup(this.createArguments());
       this.updateState(undefined);
+      apiService.adminCache = null;
       return this.success(state);
     } catch (popupSignOutError) {
       console.log("Popup signout error: ", popupSignOutError);
@@ -122,6 +124,7 @@ export class AuthorizeService {
     try {
       const response = await this.userManager.signoutCallback(url);
       this.updateState(null);
+      apiService.adminCache = null;
       return this.success(response && response.data);
     } catch (error) {
       console.log(`There was an error trying to log out '${error}'.`);
