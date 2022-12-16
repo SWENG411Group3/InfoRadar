@@ -109,7 +109,15 @@ class ApiService {
     uploadTemplateLighthouse(lighthouse) {
         return this.postData("/api/Lighthouse/New", lighthouse);
     }
-    s
+
+    runMessenger(lighthouse) {
+        return this.postData(`/api/Lighthouse/${lighthouse}/SendMessages`);
+    }
+
+    runVisitor(lighthouse) {
+        return this.postData(`/api/Lighthouse/${lighthouse}/Run`);
+    }
+
     async enableLighthouse(lighthouse, enabled) {
         const token = await authService.getAccessToken();
         return fetch(`/api/Lighthouse/${lighthouse}`, {

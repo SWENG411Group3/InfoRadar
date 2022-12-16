@@ -67,6 +67,18 @@ class LighthouseBody extends Component {
         }
     }
 
+    runMsg() {
+        apiService.runMessenger(this.props.id)
+            .then(e => alert("started running"))
+            .catch(e => alert("already started"));
+    }
+
+    runVst() {
+        apiService.runVisitor(this.props.id)
+            .then(e => alert("started running"))
+            .catch(e => alert("already started"));
+    }
+
     render() {
         if (this.state.loading) {
             return <div>Loading lighthouse...</div>
@@ -127,6 +139,11 @@ class LighthouseBody extends Component {
                                     </tr>
                                 </tbody>
                             </table>
+
+                            {this.state.isAdmin && <div className="spaced-out-buttons">
+                                <button className="btn btn-primary" onClick={this.runVst.bind(this)}>Run Visitor</button>
+                                <button className="btn btn-primary" onClick={this.runMsg.bind(this)}>Run Messenger</button>
+                            </div>}
                         </div>
                         <div className="col">
                             <Reports

@@ -103,7 +103,7 @@ export class DashboardAdminButtons extends Component {
     render() {
         return (
             <div>
-                <div id="admin-upload">
+                <div className="spaced-out-buttons">
                     <label htmlFor="upload-template">
                         <div className="btn btn-primary">Upload Template</div>
                     </label>
