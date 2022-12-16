@@ -118,6 +118,22 @@ class ApiService {
         return this.postData(`/api/Lighthouse/${lighthouse}/Run`);
     }
 
+    async downloadLogs(lighthouse) {
+        const token = await authService.getAccessToken();
+        return fetch("/api/ReportingEngine/ErrorLogs/" + lighthouse, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .then(res => res.blob())
+            .then(blob => {
+                var a = document.createElement("a");
+                a.href = window.URL.createObjectURL(blob);
+                a.setAttribute("download", "logs.zip");
+                a.click();
+            });
+    }
+
     async enableLighthouse(lighthouse, enabled) {
         const token = await authService.getAccessToken();
         return fetch(`/api/Lighthouse/${lighthouse}`, {

@@ -79,6 +79,10 @@ class LighthouseBody extends Component {
             .catch(e => alert("already started"));
     }
 
+    downlogs() {
+        apiService.downloadLogs(this.props.id);
+    }
+
     render() {
         if (this.state.loading) {
             return <div>Loading lighthouse...</div>
@@ -143,6 +147,7 @@ class LighthouseBody extends Component {
                             {this.state.isAdmin && <div className="spaced-out-buttons">
                                 <button className="btn btn-primary" onClick={this.runVst.bind(this)}>Run Visitor</button>
                                 <button className="btn btn-primary" onClick={this.runMsg.bind(this)}>Run Messenger</button>
+                                <button className="btn btn-primary" onClick={this.downlogs.bind(this)}>Download logs</button>
                             </div>}
                         </div>
                         <div className="col">
