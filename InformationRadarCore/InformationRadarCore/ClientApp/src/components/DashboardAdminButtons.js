@@ -32,25 +32,13 @@ function readJsonFile(e) {
 export class DashboardAdminButtons extends Component {
     static displayName = DashboardAdminButtons.name;
 
-    constructor(props) {
-        super(props);
-        this.templates = {};
-        this.state = {
-            canTemplate: false,
-        }
-    }
-
     async uploadTemplate(e) {
         readJsonFile(e)
             .then(json => {
                 apiService.uploadTemplate(json)
                     .then(liveTemplate => {
-                        json.id = liveTemplate.id;
-                        this.templates[json.internalName] = json;
-                        this.setState({
-                            canTemplate: true,
-                        });
                         alert("Template uploaded");
+                        window.location.reload();
                     })
                     .catch(e => {
                         console.error(e);
@@ -64,11 +52,16 @@ export class DashboardAdminButtons extends Component {
     }
 
     async newLighthouse(e) {
-
+        const evnt = this.props.onNewLighthouse;
         readJsonFile(e)
             .then(json => {
                 apiService.uploadCustomLighthouse(json)
                     .then(liveLighthouse => {
+                        json.id = liveLighthouse.id;
+                        json.subscribed = false;
+                        if (evnt) {
+                            evnt(json);
+                        }
                         alert("Lighthouse uploaded");
                     })
                     .catch(e => {
@@ -82,7 +75,30 @@ export class DashboardAdminButtons extends Component {
             });
     }
 
-    async templLighthouse(e) {}
+    async templLighthouse(e) {
+        const evnt = this.props.onNewLighthouse;
+        readJsonFile(e)
+            .then(json => {
+                apiService.uploadTemplateLighthouse(json)
+                    .then(liveLighthouse => {
+                        json.id = liveLighthouse.id;
+                        json.subscribed = false;
+                        if (evnt) {
+                            evnt(json);
+                        }
+                        alert("Lighthouse uploaded");
+                    })
+                    .catch(e => {
+                        console.error(e);
+                        alert("Error: " + e);
+                    })
+            })
+            .catch(e => {
+                alert("Could not parse template. Template body must be a valid JSON");
+                console.error(e);
+            });
+
+    }
 
     render() {
         return (
@@ -108,11 +124,11 @@ export class DashboardAdminButtons extends Component {
                     <input id="upload-custom-lighthouse" 
                         className="invisible"
                         type="file" name="new-lighthouse-file" 
-                        accept=".json" onInput={this.newLighthouse} />
+                        accept=".json" onInput={this.newLighthouse.bind(this)} />
                     <input id="upload-template-lighthouse" 
                         className="invisible"
                         type="file" name="new-lighthouse-template-file" 
-                        accept=".json" onInput={this.templLighthouse} />
+                        accept=".json" onInput={this.templLighthouse.bind(this)} />
                 </div>
             </div>
         );

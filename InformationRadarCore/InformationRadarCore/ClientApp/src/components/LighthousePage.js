@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { Reports } from "./Reports";
 
 function formatSeconds(seconds) {
+    seconds = +seconds;
     const hours = Math.floor(seconds / 3600);
     seconds %= 3600;
 
@@ -15,7 +16,7 @@ function formatSeconds(seconds) {
     }
 
     if (minutes > 0) {
-        return `$${minutes}m ${seconds}s`;
+        return `${minutes}m ${seconds}s`;
     }
 
     return seconds + "s";

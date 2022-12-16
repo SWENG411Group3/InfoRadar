@@ -42,6 +42,10 @@ class ApiService {
         return this.basicGetRequest("/api/Lighthouse", options);
     }
 
+    getTemplates(options = {}) {
+        return this.basicGetRequest("/api/Template", options);
+    }
+
     getReports(options = {}) {
         return this.basicGetRequest("/api/ReportingEngine/Reports", options);
     }

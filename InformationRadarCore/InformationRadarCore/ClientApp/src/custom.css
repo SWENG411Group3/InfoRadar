@@ -20,4 +20,10 @@ code {
 #admin-upload {
     display: flex;
     gap: 10px;
+    margin: 5px;
+}
+
+.template-card {
+    padding: 10px;
+    margin: 10px;
 }
