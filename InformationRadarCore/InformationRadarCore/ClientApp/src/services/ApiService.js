@@ -109,6 +109,48 @@ class ApiService {
     uploadTemplateLighthouse(lighthouse) {
         return this.postData("/api/Lighthouse/New", lighthouse);
     }
+    s
+    async enableLighthouse(lighthouse, enabled) {
+        const token = await authService.getAccessToken();
+        return fetch(`/api/Lighthouse/${lighthouse}`, {
+            method: "PATCH",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                enabled
+            })
+        })
+    }
+
+    async subscribe(lighthouse, subscribed) {
+        const token = await authService.getAccessToken();
+        return fetch(`/api/Lighthouse/${lighthouse}/Subscription`, {
+            method: "PUT",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                subscribed
+            })
+        });
+    }
+
+    async resolve(lighthouse) {
+        const token = await authService.getAccessToken();
+        return fetch(`/api/Lighthouse/${lighthouse}/Resolve`, {
+            method: "PATCH",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            }
+        });
+    }
 }
 
 // Adds message attribute to JSON deserialization errors

@@ -81,7 +81,7 @@ export class Reports extends Component {
         this.state = {
             entries: [],
             isComplete: true,
-            cursor: null,
+            cursor: "",
         };
     }
 
@@ -91,7 +91,8 @@ export class Reports extends Component {
 
     async loadReports() {
         const { entries, isComplete, cursor } = await apiService.getReports({
-            lighthouse: this.props.lighthouse
+            lighthouse: this.props.lighthouse,
+            cursor: this.state.cursor,
         });
 
         this.setState({

@@ -53,6 +53,20 @@ class LighthouseBody extends Component {
         return <p>Lighthouse <code>{this.state.lighthouse.internalName}</code></p>
     }
 
+    onEnable(e) {
+        apiService.enableLighthouse(this.props.id, e.target.checked)
+    }
+
+    onSubscribe(e) {
+        apiService.subscribe(this.props.id, e.target.checked)
+    }
+
+    onResolve(e) {
+        if (e.target.checked) {
+            apiService.resolve(this.props.id);
+        }
+    }
+
     render() {
         if (this.state.loading) {
             return <div>Loading lighthouse...</div>
@@ -74,6 +88,7 @@ class LighthouseBody extends Component {
                                                 id="lighthouse-enabled-check"
                                                 disabled={!this.state.isAdmin}
                                                 defaultChecked={this.state.lighthouse.enabled}
+                                                onChange={this.onEnable.bind(this)}
                                             />
                                         </td>
                                     </tr>
@@ -84,6 +99,7 @@ class LighthouseBody extends Component {
                                                 id="lighthouse-error-check"
                                                 disabled={!this.state.isAdmin || !this.state.lighthouse.hasError}
                                                 defaultChecked={this.state.lighthouse.hasError}
+                                                onChange={this.onResolve.bind(this)}
                                             />
                                         </td>
                                     </tr>
@@ -93,6 +109,7 @@ class LighthouseBody extends Component {
                                             <input type="checkbox"
                                                 id="lighthouse-subscribed-check"
                                                 defaultChecked={this.state.lighthouse.subscribed}
+                                                onChange={this.onSubscribe.bind(this)}
                                             />
                                         </td>
                                     </tr>

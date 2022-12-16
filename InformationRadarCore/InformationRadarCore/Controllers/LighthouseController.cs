@@ -141,6 +141,7 @@ namespace InformationRadarCore.Controllers
                     e.Running,
                     e.Frequency,
                     e.MessengerFrequency,
+                    e.Enabled,
                     e.LastSentMessage,
                     e.LastUpdated,
                     e.LastVisitorRun,

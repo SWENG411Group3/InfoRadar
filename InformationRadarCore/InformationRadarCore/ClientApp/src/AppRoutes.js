@@ -20,15 +20,6 @@ const AppRoutes = [
     requireAuth: true,
     element: <LighthousePage />
   },
-  {
-    path: '/counter',
-    element: <Counter />
-  },
-  {
-    path: '/fetch-data',
-    requireAuth: true,
-    element: <FetchData />
-  },
   ...ApiAuthorzationRoutes
 ];
 
