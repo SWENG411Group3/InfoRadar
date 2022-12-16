@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import authService from "./api-authorization/AuthorizeService";
 import apiService from "../services/ApiService";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
-import { Lighthouses } from "./Lighthouses";
+import { Dashboard } from "./Dashboard";
 
 export class Home extends Component {
     static displayName = Home.name;
@@ -22,7 +21,7 @@ export class Home extends Component {
 
     render() {
         if (this.state.loggedIn) {
-            return <Lighthouses />
+            return <Dashboard />
         }
         return <div>
             <h1>Welcome</h1>

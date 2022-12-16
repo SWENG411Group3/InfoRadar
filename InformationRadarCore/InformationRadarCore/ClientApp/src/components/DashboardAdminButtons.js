@@ -63,7 +63,24 @@ export class DashboardAdminButtons extends Component {
             });
     }
 
-    async newLighthouse(e) {}
+    async newLighthouse(e) {
+
+        readJsonFile(e)
+            .then(json => {
+                apiService.uploadCustomLighthouse(json)
+                    .then(liveLighthouse => {
+                        alert("Lighthouse uploaded");
+                    })
+                    .catch(e => {
+                        console.error(e);
+                        alert("Error: " + e);
+                    })
+            })
+            .catch(e => {
+                alert("Could not parse template. Template body must be a valid JSON");
+                console.error(e);
+            });
+    }
 
     async templLighthouse(e) {}
 

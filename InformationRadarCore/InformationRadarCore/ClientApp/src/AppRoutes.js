@@ -3,7 +3,7 @@ import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
 import { Home } from "./components/Home";
 import { LighthousePage } from "./components/LighthousePage";
-import { Lighthouses } from './components/Lighthouses';
+import { Dashboard } from './components/Dashboard';
 
 const AppRoutes = [
   {
@@ -12,8 +12,8 @@ const AppRoutes = [
   },
   {
     path: '/dashboard',
-    requireAuth: true,
-    element: <Lighthouses />
+      requireAuth: true,
+      element: <Dashboard />
   },
   {
     path: '/Lighthouse/:id',

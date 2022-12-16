@@ -11,7 +11,6 @@ export class Lighthouses extends Component {
             entries: [],
             isComplete: false,
             cursor: null,
-            isAdmin: false,
         };
     }
 
@@ -22,12 +21,10 @@ export class Lighthouses extends Component {
     async loadLighthouses() {
         const old = this.state.entries;
         const lighthouses = await apiService.getLighthouses();
-        const isAdmin = await apiService.isAdmin();
         this.setState({
             entries: old.concat(lighthouses.entries),
             isComplete: lighthouses.isComplete,
             cursor: lighthouses.cursor,
-            isAdmin,
         });
     }
 
@@ -38,9 +35,6 @@ export class Lighthouses extends Component {
     render() {
         return (
             <div>
-                {this.state.isAdmin && 
-                    <DashboardAdminButtons />}
-
                 <table className="table table-striped" aria-labelledby="tabelLabel">
                     <thead>
                         <tr>
